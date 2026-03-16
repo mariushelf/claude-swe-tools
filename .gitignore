@@ -1,0 +1,20 @@
+# Sandbox artifacts
+.bash_profile
+.bashrc
+.gitconfig
+.gitmodules
+.idea
+.mcp.json
+.profile
+.ripgreprc
+.vscode
+.zprofile
+.zshrc
+HEAD
+config
+hooks
+objects
+refs
+
+# Claude Code local
+.claude/
