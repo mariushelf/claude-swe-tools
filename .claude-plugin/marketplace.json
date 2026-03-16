@@ -1,7 +1,8 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "claude-swe-tools",
-  "description": "Software engineering skills for Claude Code: design advisory teams and parallel issue workflows",
+  "metadata": {
+    "description": "Software engineering skills for Claude Code: design advisory teams and parallel issue workflows"
+  },
   "owner": {
     "name": "Marius Helf",
     "email": "marius@happyyeti.tech"
@@ -9,7 +10,7 @@
   "plugins": [
     {
       "name": "swe-tools",
-      "source": ".",
+      "source": "./",
       "description": "Design advisor team and parallel GitHub issue workflows",
       "version": "0.1.0",
       "author": {

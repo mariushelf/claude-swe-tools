@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: claude-plugin-validate
+        name: Validate Claude Code plugin
+        entry: claude plugin validate .
+        language: system
+        files: \.claude-plugin/
+        pass_filenames: false

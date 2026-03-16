@@ -38,7 +38,16 @@ Recommended to run in a dev container or other isolated environment with
 
 ## Installation
 
+From the command line:
+
 ```bash
+`claude plugin marketplace add mariushelf/claude-swe-tools
+claude plugin install swe-tools@claude-swe-tools`
+```
+
+Or interactively inside Claude Code:
+
+```
 /plugin marketplace add mariushelf/claude-swe-tools
 /plugin install swe-tools@claude-swe-tools
 ```
