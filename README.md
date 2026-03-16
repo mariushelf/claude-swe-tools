@@ -26,7 +26,7 @@ Orchestrate multiple GitHub issues in parallel — one worktree-isolated agent p
 ## Installation
 
 ```bash
-claude plugin add --from github:xmhelf/swe-tools
+claude plugin add --from github:mariushelf/swe-tools
 ```
 
 ## License
