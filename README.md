@@ -2,6 +2,8 @@
 
 A curated collection of software engineering skills for Claude Code.
 
+Beta: use at your own risk and provide feedback!
+
 ## Skills
 
 ### design-advisor
@@ -19,14 +21,26 @@ Spawn a 4-person agent team (architect, UX advocate, domain expert, devil's advo
 
 Orchestrate multiple GitHub issues in parallel — one worktree-isolated agent per issue, each producing a PR with green CI.
 
-**Usage:** `/working-on-parallel-issues 45 47 52`
+The orchestrator avoids merge conflicts by serialising tasks that are likely to conflict
+with each other.
+
+Recommended to run in a dev container or other isolated environment with
+`--dangerously-skip-permission` to allow for fully autonomous operation.
+
+**Usage:** `/working-on-parallel-issues 128 129 130 131 134`
 
 **Note:** Requires the [superpowers](https://github.com/obra/superpowers) plugin for the `dispatching-parallel-agents` orchestration pattern.
+
+**Output**
+
+![working-on-parallel-issues screenshot](docs/working-on-parallel-issues-screenshot.png)
+
 
 ## Installation
 
 ```bash
-claude plugin add --from github:mariushelf/swe-tools
+/plugin marketplace add mariushelf/claude-swe-tools
+/plugin install swe-tools@claude-swe-tools
 ```
 
 ## License

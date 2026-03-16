@@ -6,7 +6,7 @@
     "name": "Marius Helf",
     "email": "marius@happyyeti.tech"
   },
-  "repository": "https://github.com/xmhelf/swe-tools",
+  "repository": "https://github.com/mariushelf/claude-swe-tools",
   "license": "MIT",
   "keywords": ["skills", "design", "architecture", "parallel-issues", "workflows"]
 }
