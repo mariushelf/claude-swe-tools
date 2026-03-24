@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "An external brain for Claude — structured, git-versioned knowledge vault browsable in Obsidian",
   "author": {
-    "name": "xmhelf"
+    "name": "Marius Helf"
   },
   "repository": "https://github.com/mariushelf/claude-swe-tools",
   "license": "MIT",

@@ -28,7 +28,7 @@
       "description": "Persistent, git-versioned knowledge vault for Claude — captures decisions, gotchas, patterns, and solutions as Obsidian-browsable Markdown",
       "version": "0.2.0",
       "author": {
-        "name": "xmhelf"
+        "name": "Marius Helf"
       },
       "homepage": "https://github.com/mariushelf/claude-swe-tools",
       "license": "MIT",
