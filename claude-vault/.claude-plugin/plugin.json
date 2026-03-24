@@ -1,0 +1,11 @@
+{
+  "name": "claude-vault",
+  "version": "0.1.0",
+  "description": "An external brain for Claude — structured, git-versioned knowledge vault browsable in Obsidian",
+  "author": {
+    "name": "xmhelf"
+  },
+  "repository": "https://github.com/mariushelf/claude-swe-tools",
+  "license": "MIT",
+  "keywords": ["skills", "knowledge", "vault", "obsidian", "memory", "adr", "notes"]
+}
