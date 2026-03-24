@@ -20,12 +20,19 @@ Or interactively inside Claude Code:
 
 ## First-Run Setup
 
-### 1. Sandbox Write Permissions
+### 1. Permissions
 
-Claude Code runs in a filesystem sandbox. Add `~/claude-vault` to the write allowlist in `~/.claude/settings.json`:
+Claude Code needs sandbox write access and tool permissions for the vault directory. Add these to `~/.claude/settings.json`:
 
 ```json
 {
+  "permissions": {
+    "allow": [
+      "Edit(~/claude-vault/**)",
+      "Write(~/claude-vault/**)",
+      "Bash(mkdir:*)"
+    ]
+  },
   "sandbox": {
     "filesystem": {
       "allowWrite": ["~/claude-vault"]
@@ -33,6 +40,8 @@ Claude Code runs in a filesystem sandbox. Add `~/claude-vault` to the write allo
   }
 }
 ```
+
+This allows Claude to create, edit, and organize vault files without prompting for each operation. Git commands (`Bash(git:*)`) are also needed but most users already have that allowed.
 
 ### 2. Vault Initialization
 
