@@ -26,7 +26,7 @@
       "name": "claude-vault",
       "source": "./claude-vault",
       "description": "Persistent, git-versioned knowledge vault for Claude — captures decisions, gotchas, patterns, and solutions as Obsidian-browsable Markdown",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "Marius Helf"
       },

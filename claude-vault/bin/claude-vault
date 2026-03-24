@@ -1,0 +1,438 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VAULT_PATH="${CLAUDE_VAULT_PATH:-$HOME/claude-vault}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+usage() {
+    cat <<'EOF'
+Usage: claude-vault <command> [options]
+
+Commands:
+  init                          Initialize a new vault
+  status                        Show vault overview
+  search [--type T] [--tag T] [--project P] [KEYWORD...]
+                                Search the vault
+  analysis                      Gather data for insights report
+  tags                          List existing tags
+  next-adr <project>            Get next ADR number for a project
+  capture [options] --file F    Write an entry, update indices, git commit
+
+Capture options:
+  --type TYPE          Entry type (adr|brainstorm|pattern|gotcha|solution|note)
+  --project PROJECT    Project name (omit for cross-cutting knowledge)
+  --title TITLE        Entry title
+  --file FILE          Path to the content file to capture
+  --supersedes FILE    Relative path of entry being superseded
+
+Environment:
+  CLAUDE_VAULT_PATH    Vault location (default: ~/claude-vault)
+EOF
+    exit 1
+}
+
+die() { echo "ERROR: $*" >&2; exit 1; }
+
+# ── init ──────────────────────────────────────────────────────────────────────
+
+cmd_init() {
+    [ -d "$VAULT_PATH" ] && die "Vault already exists at $VAULT_PATH"
+
+    local templates="$SCRIPT_DIR/templates"
+
+    mkdir -p "$VAULT_PATH"/{projects,knowledge/{patterns,gotchas,solutions}}
+    cp "$templates/vault-index.md" "$VAULT_PATH/_index.md"
+    cp -r "$templates/.obsidian" "$VAULT_PATH/.obsidian"
+
+    cat > "$VAULT_PATH/.gitignore" << 'GITIGNORE'
+.vault-lock
+.obsidian/workspace*.json
+.obsidian/graph.json
+.obsidian/backlink.json
+.memsearch/
+GITIGNORE
+
+    git -C "$VAULT_PATH" init
+    git -C "$VAULT_PATH" add .
+    git -C "$VAULT_PATH" commit -m "init: initialize claude vault"
+
+    echo "Vault initialized at $VAULT_PATH"
+}
+
+# ── status ────────────────────────────────────────────────────────────────────
+
+cmd_status() {
+    if [ ! -d "$VAULT_PATH" ]; then
+        echo "NO_VAULT"
+        exit 0
+    fi
+
+    # Permission check
+    if touch "$VAULT_PATH/.vault-lock" 2>/dev/null; then
+        rm -f "$VAULT_PATH/.vault-lock"
+        echo "permissions: ok"
+    else
+        echo "permissions: DENIED"
+    fi
+
+    # Projects
+    echo ""
+    echo "## Projects"
+    if ls -d "$VAULT_PATH/projects"/*/ >/dev/null 2>&1; then
+        for dir in "$VAULT_PATH/projects"/*/; do
+            local project
+            project=$(basename "$dir")
+            local count
+            count=$(find "$dir" -name "*.md" ! -name "_index.md" 2>/dev/null | wc -l)
+            echo "- $project ($count entries)"
+        done
+    else
+        echo "(none)"
+    fi
+
+    # Counts by type
+    echo ""
+    echo "## Counts"
+    for type in adr brainstorm pattern gotcha solution note; do
+        local n
+        n=$({ grep -rl "^type: $type" "$VAULT_PATH" --include="*.md" 2>/dev/null || true; } | wc -l)
+        echo "$type: ${n:-0}"
+    done
+
+    # Recent entries
+    echo ""
+    echo "## Recent"
+    while IFS= read -r file; do
+        [ -z "$file" ] && continue
+        local date title ftype rel
+        date=$(grep "^date:" "$file" | head -1 | sed 's/^date: *//')
+        title=$(grep "^title:" "$file" | head -1 | sed 's/^title: *"\?\([^"]*\)"\?/\1/')
+        ftype=$(grep "^type:" "$file" | head -1 | sed 's/^type: *//')
+        rel="${file#$VAULT_PATH/}"
+        echo "- [$ftype] $title ($date) — $rel"
+    done < <(grep -rl "^date:" "$VAULT_PATH" --include="*.md" 2>/dev/null \
+        | xargs -r grep -l "^type:" \
+        | while read -r f; do echo "$(grep '^date:' "$f" | head -1 | sed 's/^date: *//') $f"; done \
+        | sort -r | head -5 | awk '{print $2}')
+
+    # Git status
+    echo ""
+    echo "## Git"
+    local gs
+    gs=$(git -C "$VAULT_PATH" status --short 2>/dev/null || echo "(not a git repo)")
+    if [ -z "$gs" ]; then
+        echo "clean"
+    else
+        echo "$gs"
+    fi
+}
+
+# ── search ────────────────────────────────────────────────────────────────────
+
+cmd_search() {
+    [ -d "$VAULT_PATH" ] || die "No vault at $VAULT_PATH"
+
+    local type="" tag="" project=""
+    local -a keywords=()
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --type)    type="$2"; shift 2 ;;
+            --tag)     tag="$2"; shift 2 ;;
+            --project) project="$2"; shift 2 ;;
+            *)         keywords+=("$1"); shift ;;
+        esac
+    done
+
+    local search_path="$VAULT_PATH"
+    [ -n "$project" ] && search_path="$VAULT_PATH/projects/$project"
+
+    local found=0
+    while IFS= read -r -d '' file; do
+        local frontmatter
+        frontmatter=$(awk '/^---$/{if(c++)exit;next}c' "$file")
+
+        # Filter by type
+        if [ -n "$type" ]; then
+            echo "$frontmatter" | grep -q "^type: .*$type" || continue
+        fi
+
+        # Filter by tag
+        if [ -n "$tag" ]; then
+            echo "$frontmatter" | grep -q "  - $tag" || continue
+        fi
+
+        # Filter by keywords
+        if [ ${#keywords[@]} -gt 0 ]; then
+            local searchable match=true
+            searchable=$(echo "$frontmatter"; head -20 "$file")
+            for kw in "${keywords[@]}"; do
+                echo "$searchable" | grep -qi "$kw" || { match=false; break; }
+            done
+            $match || continue
+        fi
+
+        local title date ftype rel preview
+        title=$(echo "$frontmatter" | grep "^title:" | sed 's/^title: *"\?\([^"]*\)"\?/\1/')
+        date=$(echo "$frontmatter" | grep "^date:" | sed 's/^date: *//')
+        ftype=$(echo "$frontmatter" | grep "^type:" | sed 's/^type: *//')
+        rel="${file#$VAULT_PATH/}"
+        preview=$(awk '/^---$/{if(c++)d=1;next}d && /^[^#]/ && NF{print;exit}' "$file")
+
+        echo "[$ftype] $rel"
+        echo "  Title: $title | Date: $date"
+        [ -n "$preview" ] && echo "  $preview"
+        echo ""
+        found=$((found + 1))
+    done < <(find "$search_path" -name '*.md' ! -name '_index.md' -print0 2>/dev/null)
+
+    echo "($found results)"
+}
+
+# ── analysis ──────────────────────────────────────────────────────────────────
+
+cmd_analysis() {
+    [ -d "$VAULT_PATH" ] || die "No vault at $VAULT_PATH"
+
+    echo "## Titles"
+    grep -rh "^title:" "$VAULT_PATH" --include="*.md" 2>/dev/null || true
+
+    echo ""
+    echo "## Type Counts"
+    grep -rh "^type:" "$VAULT_PATH" --include="*.md" 2>/dev/null | sort | uniq -c | sort -rn || true
+
+    echo ""
+    echo "## Activity Timeline"
+    grep -rh "^date:" "$VAULT_PATH" --include="*.md" 2>/dev/null | sort || true
+
+    echo ""
+    echo "## Tag Frequency"
+    grep -rh "^  - " "$VAULT_PATH" --include="*.md" 2>/dev/null | sort | uniq -c | sort -rn || true
+
+    echo ""
+    echo "## Git History (3 months)"
+    git -C "$VAULT_PATH" log --oneline --since="3 months ago" 2>/dev/null || echo "(no git history)"
+
+    echo ""
+    echo "## Project Breakdown"
+    if ls -d "$VAULT_PATH/projects"/*/ >/dev/null 2>&1; then
+        for dir in "$VAULT_PATH/projects"/*/; do
+            local project count latest
+            project=$(basename "$dir")
+            count=$(find "$dir" -name "*.md" ! -name "_index.md" 2>/dev/null | wc -l)
+            latest=$(grep -rh "^date:" "$dir" --include="*.md" 2>/dev/null | sort -r | head -1 || true)
+            echo "$project: $count files, $latest"
+        done
+    else
+        echo "(no projects)"
+    fi
+}
+
+# ── tags ──────────────────────────────────────────────────────────────────────
+
+cmd_tags() {
+    [ -d "$VAULT_PATH" ] || die "No vault at $VAULT_PATH"
+    grep -rh "^  - " "$VAULT_PATH" --include="*.md" 2>/dev/null | sort -u || echo "(no tags)"
+}
+
+# ── next-adr ──────────────────────────────────────────────────────────────────
+
+cmd_next_adr() {
+    local project="${1:?project name required}"
+    local adr_dir="$VAULT_PATH/projects/$project/adrs"
+
+    local last=0
+    if [ -d "$adr_dir" ]; then
+        last=$(ls "$adr_dir" 2>/dev/null | grep -oP '^\d+' | sort -n | tail -1 || echo 0)
+        [ -z "$last" ] && last=0
+    fi
+    printf "%04d\n" $((last + 1))
+}
+
+# ── capture ───────────────────────────────────────────────────────────────────
+
+cmd_capture() {
+    [ -d "$VAULT_PATH" ] || die "No vault at $VAULT_PATH"
+
+    local type="" project="" title="" file="" supersedes=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --type)       type="$2"; shift 2 ;;
+            --project)    project="$2"; shift 2 ;;
+            --title)      title="$2"; shift 2 ;;
+            --file)       file="$2"; shift 2 ;;
+            --supersedes) supersedes="$2"; shift 2 ;;
+            *) die "Unknown capture option: $1" ;;
+        esac
+    done
+
+    [ -z "$type" ] && die "--type required"
+    [ -z "$title" ] && die "--title required"
+    [ -z "$file" ] && die "--file required"
+    [ -f "$file" ] || die "Content file not found: $file"
+
+    # Determine filename and destination path
+    local date_str filename dest_dir dest_path
+    date_str=$(date +%Y-%m-%d)
+
+    local kebab_title
+    kebab_title=$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+
+    case "$type" in
+        adr)
+            [ -z "$project" ] && die "ADRs require --project"
+            local next_num
+            next_num=$(cmd_next_adr "$project")
+            filename="${next_num}-${date_str}-${kebab_title}.md"
+            dest_dir="$VAULT_PATH/projects/$project/adrs"
+            ;;
+        brainstorm|note)
+            [ -z "$project" ] && die "${type}s require --project"
+            filename="${date_str}-${kebab_title}.md"
+            dest_dir="$VAULT_PATH/projects/$project/${type}s"
+            ;;
+        pattern|gotcha|solution)
+            filename="${date_str}-${kebab_title}.md"
+            dest_dir="$VAULT_PATH/knowledge/${type}s"
+            ;;
+        *) die "Unknown type: $type (expected: adr|brainstorm|pattern|gotcha|solution|note)" ;;
+    esac
+
+    mkdir -p "$dest_dir"
+    dest_path="$dest_dir/$filename"
+    cp "$file" "$dest_path"
+
+    local rel_path="${dest_path#$VAULT_PATH/}"
+    local files_to_add=("$rel_path")
+
+    # Handle supersession
+    if [ -n "$supersedes" ] && [ -f "$VAULT_PATH/$supersedes" ]; then
+        local new_basename
+        new_basename=$(basename "$filename" .md)
+        # Add superseded_by to old file's frontmatter
+        sed -i "s/^---$/---\nsuperseded_by: \"[[$new_basename]]\"/" "$VAULT_PATH/$supersedes"
+        # Only apply to first occurrence (the closing ---)
+        # Actually let's be more precise: add after the opening ---
+        # The sed above adds after every --- which is wrong. Let's fix:
+        # Revert and do it properly
+        git -C "$VAULT_PATH" checkout -- "$supersedes" 2>/dev/null || true
+        awk -v link="superseded_by: \"[[$new_basename]]\"" '
+            /^---$/ && !done { print; if (seen++) { done=1 }; next }
+            seen == 1 && !inserted { print link; inserted=1 }
+            { print }
+        ' "$VAULT_PATH/$supersedes" > "$VAULT_PATH/${supersedes}.tmp" \
+            && mv "$VAULT_PATH/${supersedes}.tmp" "$VAULT_PATH/$supersedes"
+        files_to_add+=("$supersedes")
+    fi
+
+    # Update project index (for project-scoped types)
+    if [[ "$type" == "adr" || "$type" == "brainstorm" || "$type" == "note" ]]; then
+        local project_index="projects/$project/_index.md"
+        if [ ! -f "$VAULT_PATH/$project_index" ]; then
+            # Create project index from template
+            mkdir -p "$VAULT_PATH/projects/$project"
+            sed "s/\${PROJECT_NAME}/$project/g" "$SCRIPT_DIR/templates/project-index.md" \
+                > "$VAULT_PATH/$project_index"
+        fi
+
+        local section_name
+        case "$type" in
+            adr) section_name="ADRs" ;;
+            brainstorm) section_name="Brainstorms" ;;
+            note) section_name="Notes" ;;
+        esac
+
+        local entry_basename
+        entry_basename=$(basename "$filename" .md)
+        local entry="- [[$entry_basename|$title]] ($date_str)"
+
+        _index_update "$VAULT_PATH/$project_index" "$section_name" "$entry"
+        files_to_add+=("$project_index")
+    fi
+
+    # Update vault-level index
+    local vault_index="$VAULT_PATH/_index.md"
+
+    # Ensure project is listed
+    if [ -n "$project" ]; then
+        if ! grep -q "projects/$project/_index" "$vault_index" 2>/dev/null; then
+            # Add project to Projects section (replace "No projects" or append)
+            _index_update "$vault_index" "Projects" "- [[projects/$project/_index|$project]]"
+        fi
+    fi
+
+    # Update knowledge counts
+    local pat_n got_n sol_n
+    pat_n=$({ grep -rl "^type: pattern" "$VAULT_PATH/knowledge/" --include="*.md" 2>/dev/null || true; } | wc -l)
+    got_n=$({ grep -rl "^type: gotcha" "$VAULT_PATH/knowledge/" --include="*.md" 2>/dev/null || true; } | wc -l)
+    sol_n=$({ grep -rl "^type: solution" "$VAULT_PATH/knowledge/" --include="*.md" 2>/dev/null || true; } | wc -l)
+    sed -i "s/\*\*Patterns:\*\* .*/\*\*Patterns:\*\* $pat_n entries/" "$vault_index"
+    sed -i "s/\*\*Gotchas:\*\* .*/\*\*Gotchas:\*\* $got_n entries/" "$vault_index"
+    sed -i "s/\*\*Solutions:\*\* .*/\*\*Solutions:\*\* $sol_n entries/" "$vault_index"
+
+    # Prepend to Recent section (keep last 10)
+    local entry_basename
+    entry_basename=$(basename "$filename" .md)
+    local recent_entry="- [[$rel_path|$title]] ($type, $date_str)"
+    _index_update "$vault_index" "Recent" "$recent_entry"
+
+    # Trim Recent to 10 entries
+    awk '
+        /^## Recent/ { in_recent=1; print; next }
+        in_recent && /^## / { in_recent=0 }
+        in_recent && /^- / { count++; if (count > 10) next }
+        { print }
+    ' "$vault_index" > "${vault_index}.tmp" && mv "${vault_index}.tmp" "$vault_index"
+
+    files_to_add+=("_index.md")
+
+    # Git commit
+    local commit_msg
+    if [ -n "$project" ]; then
+        commit_msg="$type($project): $title"
+    else
+        commit_msg="$type: $title"
+    fi
+
+    cd "$VAULT_PATH"
+    for f in "${files_to_add[@]}"; do
+        git add "$f"
+    done
+    git commit -m "$commit_msg"
+
+    echo "Captured: $rel_path"
+    echo "Committed: $commit_msg"
+}
+
+# ── index helper ──────────────────────────────────────────────────────────────
+
+_index_update() {
+    local index_path="$1" section="$2" entry="$3"
+
+    awk -v section="## $section" -v entry="$entry" '
+        $0 == section { in_section=1; print; next }
+        in_section && /^## / { if (!printed) { print entry; print ""; printed=1 } in_section=0 }
+        in_section && /^_No .* yet\._$/ { print entry; printed=1; next }
+        { print }
+        END { if (in_section && !printed) print entry }
+    ' "$index_path" > "${index_path}.tmp" && mv "${index_path}.tmp" "$index_path"
+}
+
+# ── main ──────────────────────────────────────────────────────────────────────
+
+cmd="${1:-}"
+[ -z "$cmd" ] && usage
+shift
+
+case "$cmd" in
+    init)     cmd_init ;;
+    status)   cmd_status ;;
+    search)   cmd_search "$@" ;;
+    analysis) cmd_analysis ;;
+    tags)     cmd_tags ;;
+    next-adr) cmd_next_adr "$@" ;;
+    capture)  cmd_capture "$@" ;;
+    help|-h|--help) usage ;;
+    *) die "Unknown command: $cmd" ;;
+esac
