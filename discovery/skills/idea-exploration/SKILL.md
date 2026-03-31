@@ -1,6 +1,6 @@
 ---
 name: idea-exploration
-description: Use when exploring a business or product idea - helps refine goals, problems, mechanics, and viability through honest collaborative dialogue. Triggers on 'I have an idea', 'what do you think about building X', side project concepts, product pitches, or any early-stage idea discussion.
+description: Use when exploring a business or product idea. Triggers on 'I have an idea', 'what do you think about building X', side project concepts, product pitches, or any early-stage idea discussion.
 ---
 
 # Idea Exploration
@@ -11,54 +11,30 @@ Sparring partner for business and product ideas. Not a cheerleader — an honest
 Do NOT skip straight to a summary. You MUST go through the questioning phase first, even if the user presents a fully-formed idea. There are always unexamined assumptions.
 </HARD-GATE>
 
+**When NOT to use:**
+- User has a validated idea and wants to **build** — route to implementation skills
+- User wants a **technical feasibility** assessment of a specific design — use design-advisor
+- User wants **market research only** — dispatch research agents directly, no interview needed
+- User is **iterating on an existing product** — this skill is for early-stage ideas, not feature refinement
+
 ## Process
 
-```dot
-digraph idea_exploration {
-    "Understand the raw idea" [shape=box];
-    "Paraphrase back\nand confirm" [shape=box];
-    "Dispatch landscape scan\n(background agent)" [shape=box];
-    "Offer advisory board" [shape=diamond];
-    "Dispatch advisory board\n(agent team)" [shape=box];
-    "Ask clarifying questions\n(one at a time)" [shape=box];
-    "Research results in?\nNew research needed?" [shape=diamond];
-    "Dispatch targeted research\n(background agent)" [shape=box];
-    "Weave findings in\n(research + board)" [shape=box];
-    "4-5 questions asked?" [shape=diamond];
-    "Checkpoint: summarize\nwhat you know, ask\nif user wants depth" [shape=box];
-    "Present structured summary" [shape=box];
-    "Offer to save file" [shape=box];
-    "What next?" [shape=diamond];
-    "Revise" [shape=box];
-    "Go deeper\n(summary = new baseline)" [shape=box];
-    "Route to other skill\nor generate prompt" [shape=box];
-    "Done" [shape=doublecircle];
-
-    "Understand the raw idea" -> "Paraphrase back\nand confirm";
-    "Paraphrase back\nand confirm" -> "Dispatch landscape scan\n(background agent)";
-    "Dispatch landscape scan\n(background agent)" -> "Offer advisory board";
-    "Offer advisory board" -> "Dispatch advisory board\n(agent team)" [label="yes"];
-    "Offer advisory board" -> "Ask clarifying questions\n(one at a time)" [label="no, keep it lean"];
-    "Dispatch advisory board\n(agent team)" -> "Ask clarifying questions\n(one at a time)";
-    "Ask clarifying questions\n(one at a time)" -> "Research results in?\nNew research needed?";
-    "Research results in?\nNew research needed?" -> "Dispatch targeted research\n(background agent)" [label="new task"];
-    "Research results in?\nNew research needed?" -> "Weave findings in\n(research + board)" [label="results ready"];
-    "Research results in?\nNew research needed?" -> "4-5 questions asked?" [label="nothing pending"];
-    "Dispatch targeted research\n(background agent)" -> "4-5 questions asked?";
-    "Weave findings in\n(research + board)" -> "4-5 questions asked?";
-    "4-5 questions asked?" -> "Ask clarifying questions\n(one at a time)" [label="no"];
-    "4-5 questions asked?" -> "Checkpoint: summarize\nwhat you know, ask\nif user wants depth" [label="yes"];
-    "Checkpoint: summarize\nwhat you know, ask\nif user wants depth" -> "Ask clarifying questions\n(one at a time)" [label="go deeper"];
-    "Checkpoint: summarize\nwhat you know, ask\nif user wants depth" -> "Present structured summary" [label="ready"];
-    "Present structured summary" -> "Offer to save file";
-    "Offer to save file" -> "What next?";
-    "What next?" -> "Revise" [label="fix errors"];
-    "What next?" -> "Go deeper\n(summary = new baseline)" [label="keep exploring"];
-    "What next?" -> "Route to other skill\nor generate prompt" [label="feasibility/research/validate"];
-    "What next?" -> "Done" [label="done for now"];
-    "Revise" -> "Present structured summary";
-    "Go deeper\n(summary = new baseline)" -> "Ask clarifying questions\n(one at a time)";
-}
+```mermaid
+flowchart TD
+    A[Understand the raw idea] --> B[Paraphrase back and confirm]
+    B --> C[Dispatch landscape scan + offer advisory board]
+    C --> D[Ask clarifying question]
+    D --> E{4-5 questions asked?}
+    E -- no --> D
+    E -- yes --> F[Checkpoint: summarize, state your read]
+    F -- go deeper --> D
+    F -- ready --> G[Present structured summary]
+    G --> H[Offer to save file]
+    H --> I{What next?}
+    I -- revise --> G
+    I -- go deeper --> D
+    I -- feasibility / research / validate --> J[Route to other skill or generate prompt]
+    I -- done --> K((Done))
 ```
 
 ## Phase 1: Questioning
@@ -83,17 +59,13 @@ Then ask questions one at a time. Use multiple choice for narrowing decisions (f
 - How does it make money (if it should)?
 - What needs to be true for this to work?
 
-**Checkpoint after 4-5 questions:** Pause and summarize what you know so far: "I think I'm getting a good picture of [X, Y, Z]." Then ask:
+**Checkpoint after 4-5 questions:** Summarize what you know, state your read ("I think [area] is still thin" or "we've covered the main angles"), then ask:
 
 > "a) **Go deeper on [thinnest area]** — this feels like it needs more exploration
 > b) **Go deeper on something else** — tell me what
 > c) **Summary** — I have enough to pull it together"
 
-This checkpoint is mandatory, not optional. The user decides the depth, not the interviewer.
-
-**The checkpoint repeats.** Every time the user picks "go deeper," ask another 3-4 questions, then checkpoint again. Never decide on your own that you have enough — always ask. The only way to reach the summary is the user picking (c). At each checkpoint, state your own read: "I think [area] is still thin" or "I think we've covered the main angles." The user still decides, but your opinion helps them choose.
-
-**Adaptive depth:** If the user wants to go deeper, continue. If not, move toward the summary. Don't force depth the user doesn't want, but don't skip the checkpoint either.
+**The checkpoint repeats** after every 3-4 follow-up questions. The only way to reach the summary is the user picking (c) — never decide on your own that you have enough.
 
 **Pushback style:**
 - During questioning: probe gently when something seems off. "That distribution strategy has a cold-start problem — how would you get your first 100 users?" Don't shut ideas down, but don't let weak assumptions slide.
@@ -108,7 +80,7 @@ Background haiku agents that research while the interviewer talks with the user.
 **When to dispatch:**
 - **After paraphrase confirmed:** Landscape scan — "find 3-5 existing products/services in this space, their pricing, main value prop, and biggest limitation"
 - **During questioning:** When the user reveals specifics worth validating — a market claim, a distribution channel, a technology assumption, a competitor mention. Give the agent a tight, specific task.
-- **Don't over-dispatch.** Not every user statement needs research. Be selective. Cap at ~5 research agents per session.
+- **Don't over-dispatch.** Not every user statement needs research. Roughly 1 agent per 2-3 questions is a good rhythm — be selective, not exhaustive.
 
 **How to dispatch:**
 - Use the Agent tool with `model: "haiku"` and `run_in_background: true`
@@ -116,59 +88,13 @@ Background haiku agents that research while the interviewer talks with the user.
 - Agents should use WebSearch and WebFetch to find real, current information.
 
 **How to use results:**
-- Before asking the next question, check if any research agents have completed.
-- If results are relevant to the current thread, weave them in: "By the way, my research turned up X — does that change how you're thinking about this?"
-- If the conversation has moved on but the finding matters, circle back: "Earlier we talked about [topic]. I've since found that [finding] — worth revisiting?"
-- If results are no longer relevant because the idea pivoted, hold them for the summary or discard.
-- Don't force findings into the conversation. Judgment over process.
+- Check for completed agents before each question. Weave relevant findings in naturally: "My research turned up X — does that change how you're thinking about this?"
+- If the conversation moved on, circle back if the finding still matters. If the idea pivoted, hold for summary or discard.
+- Don't force findings in. Judgment over process.
 
 ## Advisory Board
 
-An optional team of three Agent Team teammates that deliberate amongst each other in parallel to the main conversation. They are not cheerleaders or doomsayers — they are analysts with different lenses. All three should be direct, practical, and evidence-driven.
-
-**Requires:** Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` must be enabled). If Agent Teams are not available, skip this feature entirely — do not simulate it with regular subagents.
-
-**Model tiers:** Board teammates run on Sonnet (`model: "sonnet"`). Their research subagents run on Haiku (`model: "haiku"`). The interviewer stays on the user's default model.
-
-### The three roles
-
-**Enthusiast** — Focuses on opportunities, tailwinds, market gaps, and upside potential. Asks: "What's the biggest opportunity here that isn't obvious?" Looks for enabling trends, underserved segments, timing advantages, and non-obvious distribution channels. Not optimistic by default — optimistic when the evidence supports it. Will say "I don't see a strong opportunity angle here" when that's the honest read.
-
-**Devil's Advocate** — Focuses on failure modes, competitive threats, hidden costs, and flawed assumptions. Asks: "What's the most likely way this fails?" Looks for cold-start problems, margin pressure, regulatory risk, and assumptions that feel solid but aren't. Not pessimistic by default — critical when the evidence demands it. Will say "I can't find a strong objection to this" when that's the honest read.
-
-**Mediator** — Synthesizes the debate. Identifies where the other two agree (that's your high-confidence signal), where they genuinely disagree (that's where the real uncertainty lives), and what the crux of each disagreement is. Produces the final output that gets injected into the main conversation.
-
-### How it works
-
-Spawn the three teammates using Agent Teams after the user opts in. Give them the paraphrased idea and any context gathered so far.
-
-**The board follows the conversation live.** As each question is asked and answered in the main conversation, relay the key points to the board. The enthusiast and devil's advocate react to what's being discussed — they don't just debate the initial idea in isolation.
-
-**Both the enthusiast and devil's advocate dispatch their own haiku research subagents** to support or counter their positions. Same conversation trigger, different research angles:
-- User says "we'll distribute through app stores" → enthusiast searches for app store success stories in this category, devil's advocate searches for rejection rates and discovery problems
-- User says "no direct competitors" → enthusiast searches for adjacent markets ready to be disrupted, devil's advocate searches for why previous attempts in this space failed
-
-The mediator does not research independently unless it needs to resolve a factual disagreement between the other two.
-
-**Debate is ongoing, not batched.** The enthusiast and devil's advocate respond to each other's points as the conversation progresses. The mediator synthesizes periodically — not after every exchange, but when there's enough new material to produce a useful update.
-
-### How to use results
-
-The mediator's synthesis is what gets injected into the main conversation. Use it the same way as research results — naturally woven in, not forced:
-
-- "My advisory board has been debating this. They agree on [X] but are split on [Y] — the crux is [Z]."
-- "The board flagged something worth discussing: [specific point]."
-- If the board hasn't finished yet, don't wait. Continue the conversation and weave results in when they arrive.
-
-**Never report on the board's internal status.** No "the board is still deliberating," no "the mediator is waiting for input," no progress updates. The board is invisible until it has something substantive to say. The user should only hear about the board when there's an actual finding worth discussing.
-
-Include the board's findings in the structured summary under a dedicated **Advisory board assessment** section (after Competitive landscape, before Honest assessment). Report agreements, disagreements, and the crux of each disagreement. Don't flatten it into a single opinion — the disagreements are the most valuable part.
-
-### Lifecycle
-
-**Keep the board alive until the user is done.** The board stays running through questioning, the summary, and any "go deeper" or "revise" loops after the summary. Only shut it down when the user picks "Done" from the post-summary menu or transitions to a different skill/topic.
-
-Since the board follows the conversation live, there's no need to "re-dispatch" after a pivot — the board sees the pivot happen and adjusts its debate accordingly.
+Optional feature — three Agent Team teammates (enthusiast, devil's advocate, mediator) that debate in parallel to the main conversation. See @advisory-board.md for roles, setup, and lifecycle.
 
 ## Phase 2: Structured Summary
 
@@ -201,11 +127,11 @@ Don't just deliver the summary and go silent. Ask:
 
 > "What next?
 > a) **Revise** — fix anything that's off
-> b) **Go deeper** — use this summary as a starting point and keep exploring. Challenge assumptions we accepted, dig into areas that felt thin, pressure-test the weak spots
-> c) **Feasibility** — stress-test whether this can actually be built as described
-> d) **More research** — do a more thorough competitive/market analysis
-> e) **Validate** — work out how to test the riskiest assumptions
-> f) **Done** — park it and come back later"
+> b) **Go deeper** — challenge accepted assumptions, pressure-test weak spots
+> c) **Feasibility** — can this actually be built as described?
+> d) **More research** — deeper competitive/market analysis
+> e) **Validate** — how to test the riskiest assumptions
+> f) **Done** — park it for now"
 
 Each of these options may route to a different skill if one exists. This skill only handles "revise" directly — the others are transitions out. If no matching skill exists, offer to generate a self-contained prompt the user can take to a fresh session or Claude web.
 
