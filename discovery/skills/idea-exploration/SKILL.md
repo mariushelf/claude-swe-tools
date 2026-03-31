@@ -83,7 +83,13 @@ Then ask questions one at a time. Use multiple choice for narrowing decisions (f
 - How does it make money (if it should)?
 - What needs to be true for this to work?
 
-**Checkpoint after 4-5 questions:** Pause and say something like: "I think I'm getting a good picture of [X, Y, Z]. Want to go deeper on any of those, or should I start pulling the summary together?" This is mandatory, not optional. The user decides the depth, not the interviewer.
+**Checkpoint after 4-5 questions:** Pause and summarize what you know so far: "I think I'm getting a good picture of [X, Y, Z]." Then ask:
+
+> "a) **Go deeper on [thinnest area]** — this feels like it needs more exploration
+> b) **Go deeper on something else** — tell me what
+> c) **Summary** — I have enough to pull it together"
+
+This checkpoint is mandatory, not optional. The user decides the depth, not the interviewer.
 
 **Adaptive depth:** If the user wants to go deeper, continue. If not, move toward the summary. Don't force depth the user doesn't want, but don't skip the checkpoint either.
 
@@ -182,13 +188,13 @@ After presenting the summary, offer to save it: "Want me to save this to a file?
 
 Don't just deliver the summary and go silent. Ask:
 
-> "Does this capture it well? We can:
-> - **Revise** — fix anything that's off
-> - **Go deeper** — use this summary as a starting point and keep exploring. Challenge assumptions we accepted, dig into areas that felt thin, pressure-test the weak spots
-> - **Explore feasibility** — stress-test whether this can actually be built as described
-> - **Research deeper** — I can do a more thorough competitive/market analysis
-> - **Validate** — work out how to test the riskiest assumptions
-> - **Done for now** — park it and come back later"
+> "What next?
+> a) **Revise** — fix anything that's off
+> b) **Go deeper** — use this summary as a starting point and keep exploring. Challenge assumptions we accepted, dig into areas that felt thin, pressure-test the weak spots
+> c) **Feasibility** — stress-test whether this can actually be built as described
+> d) **More research** — do a more thorough competitive/market analysis
+> e) **Validate** — work out how to test the riskiest assumptions
+> f) **Done** — park it and come back later"
 
 Each of these options may route to a different skill if one exists. This skill only handles "revise" directly — the others are transitions out. If no matching skill exists, offer to generate a self-contained prompt the user can take to a fresh session or Claude web.
 
