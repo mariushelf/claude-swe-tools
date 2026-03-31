@@ -128,6 +128,8 @@ An optional team of three Agent Team teammates that deliberate amongst each othe
 
 **Requires:** Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` must be enabled). If Agent Teams are not available, skip this feature entirely — do not simulate it with regular subagents.
 
+**Model tiers:** Board teammates run on Sonnet (`model: "sonnet"`). Their research subagents run on Haiku (`model: "haiku"`). The interviewer stays on the user's default model.
+
 ### The three roles
 
 **Enthusiast** — Focuses on opportunities, tailwinds, market gaps, and upside potential. Asks: "What's the biggest opportunity here that isn't obvious?" Looks for enabling trends, underserved segments, timing advantages, and non-obvious distribution channels. Not optimistic by default — optimistic when the evidence supports it. Will say "I don't see a strong opportunity angle here" when that's the honest read.
