@@ -153,6 +153,8 @@ The mediator's synthesis is what gets injected into the main conversation. Use i
 - "The board flagged something worth discussing: [specific point]."
 - If the board hasn't finished yet, don't wait. Continue the conversation and weave results in when they arrive.
 
+**Never report on the board's internal status.** No "the board is still deliberating," no "the mediator is waiting for input," no progress updates. The board is invisible until it has something substantive to say. The user should only hear about the board when there's an actual finding worth discussing.
+
 Include the board's findings in the structured summary under a dedicated **Advisory board assessment** section (after Competitive landscape, before Honest assessment). Report agreements, disagreements, and the crux of each disagreement. Don't flatten it into a single opinion — the disagreements are the most valuable part.
 
 ### Re-dispatch
