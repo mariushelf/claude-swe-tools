@@ -1,0 +1,12 @@
+{
+  "name": "discovery",
+  "version": "0.1.0",
+  "description": "Pre-build idea evaluation pipeline: explore ideas, scan competitive landscapes, and assess feasibility before committing to build",
+  "author": {
+    "name": "Marius Helf",
+    "email": "marius@happyyeti.tech"
+  },
+  "repository": "https://github.com/mariushelf/claude-swe-tools",
+  "license": "MIT",
+  "keywords": ["skills", "ideas", "discovery", "exploration", "competitive-analysis", "feasibility"]
+}
