@@ -91,6 +91,8 @@ Then ask questions one at a time. Use multiple choice for narrowing decisions (f
 
 This checkpoint is mandatory, not optional. The user decides the depth, not the interviewer.
 
+**The checkpoint repeats.** Every time the user picks "go deeper," ask another 3-4 questions, then checkpoint again. Never decide on your own that you have enough — always ask. The only way to reach the summary is the user picking (c). At each checkpoint, state your own read: "I think [area] is still thin" or "I think we've covered the main angles." The user still decides, but your opinion helps them choose.
+
 **Adaptive depth:** If the user wants to go deeper, continue. If not, move toward the summary. Don't force depth the user doesn't want, but don't skip the checkpoint either.
 
 **Pushback style:**
@@ -134,16 +136,19 @@ An optional team of three Agent Team teammates that deliberate amongst each othe
 
 **Mediator** — Synthesizes the debate. Identifies where the other two agree (that's your high-confidence signal), where they genuinely disagree (that's where the real uncertainty lives), and what the crux of each disagreement is. Produces the final output that gets injected into the main conversation.
 
-### How to dispatch
+### How it works
 
 Spawn the three teammates using Agent Teams after the user opts in. Give them the paraphrased idea and any context gathered so far.
 
-Each teammate can dispatch their own haiku research subagents to search the web. The enthusiast should look for market tailwinds, growth signals, and opportunity data. The devil's advocate should hunt for failure cases, cautionary tales, and competitive threats. The mediator synthesizes — it doesn't research independently unless it needs to resolve a factual disagreement between the other two.
+**The board follows the conversation live.** As each question is asked and answered in the main conversation, relay the key points to the board. The enthusiast and devil's advocate react to what's being discussed — they don't just debate the initial idea in isolation.
 
-The board deliberates in 2-3 rounds:
-1. Enthusiast and Devil's Advocate each present their initial take
-2. Each responds to the other's points
-3. Mediator synthesizes: agreements, disagreements, crux points, and overall assessment
+**Both the enthusiast and devil's advocate dispatch their own haiku research subagents** to support or counter their positions. Same conversation trigger, different research angles:
+- User says "we'll distribute through app stores" → enthusiast searches for app store success stories in this category, devil's advocate searches for rejection rates and discovery problems
+- User says "no direct competitors" → enthusiast searches for adjacent markets ready to be disrupted, devil's advocate searches for why previous attempts in this space failed
+
+The mediator does not research independently unless it needs to resolve a factual disagreement between the other two.
+
+**Debate is ongoing, not batched.** The enthusiast and devil's advocate respond to each other's points as the conversation progresses. The mediator synthesizes periodically — not after every exchange, but when there's enough new material to produce a useful update.
 
 ### How to use results
 
@@ -157,9 +162,11 @@ The mediator's synthesis is what gets injected into the main conversation. Use i
 
 Include the board's findings in the structured summary under a dedicated **Advisory board assessment** section (after Competitive landscape, before Honest assessment). Report agreements, disagreements, and the crux of each disagreement. Don't flatten it into a single opinion — the disagreements are the most valuable part.
 
-### Re-dispatch
+### Lifecycle
 
-If the idea pivots significantly during questioning, you can dispatch a second round with the updated framing. Don't keep the board running continuously — it deliberates, produces a synthesis, and stops. Cap at 2 dispatches per session.
+**Keep the board alive until the user is done.** The board stays running through questioning, the summary, and any "go deeper" or "revise" loops after the summary. Only shut it down when the user picks "Done" from the post-summary menu or transitions to a different skill/topic.
+
+Since the board follows the conversation live, there's no need to "re-dispatch" after a pivot — the board sees the pivot happen and adjusts its debate accordingly.
 
 ## Phase 2: Structured Summary
 
