@@ -65,7 +65,13 @@ digraph idea_exploration {
 
 **Start by paraphrasing the idea back** in one sentence. This surfaces misunderstandings early. Once confirmed, immediately dispatch a landscape scan (see Research Agents below).
 
-**Then offer the advisory board:** "Want me to spin up the advisory board on this — an enthusiast and a devil's advocate debating in the background — or keep it lean?" If the user accepts, dispatch the advisory board (see Advisory Board below). If not, proceed without it.
+**Then offer the advisory board:**
+
+> "How deep do you want to go on this one?
+> a) **Lean** — just you and me, plus background research
+> b) **Advisory board** — I also spin up an enthusiast and a devil's advocate who debate in the background and report back"
+
+If the user picks (b), dispatch the advisory board (see Advisory Board below). Otherwise, proceed without it.
 
 Then ask questions one at a time. Use multiple choice for narrowing decisions (form factor, pricing tier, audience segment). Use open-ended questions for exploration (what's the problem, how do you imagine this working). Don't default to multiple choice — the most valuable moments often come from the user thinking out loud.
 
