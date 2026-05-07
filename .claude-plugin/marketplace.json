@@ -12,7 +12,7 @@
       "name": "swe-tools",
       "source": "./swe-tools",
       "description": "Design advisor team and parallel GitHub issue workflows",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "Marius Helf",
         "email": "marius@happyyeti.tech"
@@ -20,19 +20,6 @@
       "homepage": "https://github.com/mariushelf/claude-swe-tools",
       "license": "MIT",
       "keywords": ["skills", "design", "architecture", "parallel-issues", "workflows"],
-      "category": "development"
-    },
-    {
-      "name": "claude-vault",
-      "source": "./claude-vault",
-      "description": "Persistent, git-versioned knowledge vault for Claude — captures decisions, gotchas, patterns, and solutions as Obsidian-browsable Markdown",
-      "version": "0.3.0",
-      "author": {
-        "name": "Marius Helf"
-      },
-      "homepage": "https://github.com/mariushelf/claude-swe-tools",
-      "license": "MIT",
-      "keywords": ["skills", "knowledge", "vault", "obsidian", "memory", "adr", "notes"],
       "category": "development"
     }
   ]
