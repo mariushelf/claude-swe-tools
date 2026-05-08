@@ -28,6 +28,23 @@ Spawn a 4-person agent team (architect, UX advocate, domain expert, devil's advo
 
 **Usage:** `/design-advisor critique: the auth middleware's separation of concerns`
 
+#### deep-code-review
+
+Multi-wave fan-out of read-only specialist agents that audit a codebase for silent-wrong-output bugs, architectural drift, and aspirational dead code. Self-configures: a discovery agent reads the codebase and recommends themes; the orchestrator dispatches them in parallel against an always-on quality floor; a synthesizer dedupes and prioritises everything into a single findings document.
+
+**Always-on themes:** `architecture`, `api-ergonomics`, `dead-code`, `red-team`.
+**Conditional themes:** `numerics`, `event-flow`, `data-correctness`, `llm-correctness` — dispatched only when discovery sees the relevant surface.
+**Custom themes:** discovery invents domain-specific themes (e.g., frontend state management, IaC correctness) via a meta-template when no pre-tuned theme covers the surface.
+
+**Usage:**
+```
+/deep-code-review
+/deep-code-review scope: src/auth
+/deep-code-review verifier: docs/reviews/2025-12-01-deep-review/SYNTHESIS.md
+```
+
+Output: `docs/reviews/<YYYY-MM-DD>-deep-review/SYNTHESIS.md` plus per-theme appendix files. See the [deep-code-review README](swe-tools/skills/deep-code-review/README.md) for the design philosophy and theme catalogue.
+
 #### working-on-parallel-issues
 
 Orchestrate multiple GitHub issues in parallel — one worktree-isolated agent per issue, each producing a PR with green CI.
