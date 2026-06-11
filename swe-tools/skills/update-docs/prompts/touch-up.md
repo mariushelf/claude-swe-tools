@@ -28,7 +28,7 @@ and move on — do not guess at a different passage.
 
 A finding's **Fix** describes intent; the source code is the authority. Before
 applying a correction, verify the corrected claim against current source and
-note the `file:line`. Three outcomes:
+note where it is grounded (module and symbol). Three outcomes:
 
 - **Verified** — apply the fix as a minimal edit (see Step 3).
 - **Fix is stale** (code moved on since the audit; the Fix text itself is now
@@ -42,7 +42,8 @@ note the `file:line`. Three outcomes:
 - Change the smallest span that makes the claim correct: a value, a name, a
   sentence. Replace a paragraph only when every sentence in it is implicated.
 - Keep the surrounding heading structure, list shape, and prose order intact.
-- Ground every claim you introduce or alter in a `file:line` reference.
+- Ground every claim you introduce or alter in current source, cited at the
+  module level (class or function where that sharpens it) — never `file:line`.
 - Additions (a missing parameter row, a missing setting) go where the page's
   existing structure implies; do not add new sections unless the Fix
   explicitly asks for one.

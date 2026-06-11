@@ -15,7 +15,10 @@ links to the reasoning in the [documentation guide](documentation_guide.md).
 3. **Match the voice.** Follow [Voice and tone](voice.md): sober, direct, no
    second-person familiarity, no marketing.
 4. **Ground every claim in code.** Verify architecture and behavior against
-   current source. Do not write what cannot be verified.
+   current source. Do not write what cannot be verified. Cite implementations
+   at the module level — and the class or function where that sharpens the
+   reference — never `file:line`: line numbers churn with every commit and
+   clutter reader-facing prose.
 5. **Label the planned.** Describe what the code does today; mark
    designed-but-unimplemented behavior with a self-contained `{caution}`
    admonition stating what is unbuilt and where the design appears.

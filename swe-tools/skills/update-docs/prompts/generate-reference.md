@@ -21,7 +21,8 @@ Follow `assets/meta/writing_documentation.md` for the procedural steps.
 List every domain term that appears in the codebase or the architecture docs.
 For each term:
 
-- **Term** — one precise definition grounded in the code (`file:line`).
+- **Term** — one precise definition grounded in the code (cite the module and
+  symbol).
 - **Avoid** — one to three synonyms or near-synonyms that appear in the wild
   and are *not* used in this codebase. Naming the avoided forms prevents
   newcomers from importing them.
@@ -44,8 +45,8 @@ existing `{caution}` admonitions in the docs, edge cases in the code, and
 common misunderstandings found in issues or PR comments. Do not invent
 questions; derive them from evidence.
 
-Every answer must cite `file:line`. If a question cannot be answered from
-current source, omit it rather than guessing.
+Every answer must be grounded in current source (cite the module or symbol). If
+a question cannot be answered from current source, omit it rather than guessing.
 
 ### rest-api
 
@@ -63,8 +64,8 @@ Lead with a compact table of all endpoints, one row per endpoint:
 | Method | Path | Summary |
 |--------|------|---------|
 
-Derive the table from the route definitions directly (`file:line` for each
-route). Do not copy from existing prose — re-derive from source.
+Derive the table from the route definitions directly (one row per route
+handler). Do not copy from existing prose — re-derive from source.
 
 After the table, provide for each endpoint:
 
@@ -85,8 +86,8 @@ After the table, provide for each endpoint:
   Include such a note only when the source shows the project actually
   serves a generated reference; otherwise document the error codes here.
 
-Cite the route definitions and the request/response model or serializer
-definitions with `file:line`.
+Cite the route handlers and the request/response model or serializer
+definitions by module and symbol.
 
 ### python-api
 
@@ -102,15 +103,15 @@ page in sync automatically.
    your_package
 ```
 
-Replace `your_package` with the actual top-level package name (`file:line` for
-where the package's `__init__.py` declares `__all__` or its public surface).
+Replace `your_package` with the actual top-level package name (the package whose
+`__init__.py` declares `__all__` or its public surface).
 
 Add a brief introduction (two to four sentences) explaining what the package
 exposes and which submodules are part of the public API versus internal
-implementation. Ground every claim in `file:line`.
+implementation. Ground every claim in current source (cite the module or symbol).
 
 If the package uses `__all__` to declare its public surface, cite it:
-`src/your_package/__init__.py:N`. If it does not, flag the gap:
+`your_package/__init__.py`. If it does not, flag the gap:
 
 ```{caution}
 This package does not define `__all__`, so the public API boundary is
@@ -123,8 +124,9 @@ The autosummary above covers all top-level names; internal names
 
 ## Authoring rules
 
-- Ground every factual claim in a `file:line` reference. If a claim cannot be
-  grounded, do not make it.
+- Ground every factual claim in current source, cited at the module level
+  (class or function where that sharpens it) — never `file:line`. If a claim
+  cannot be grounded in current source, do not make it.
 - Describe what the code does today, in present tense.
 - If the codebase or the finding mentions designed-but-unbuilt behavior,
   label it with a self-contained `{caution}` admonition that states
@@ -144,7 +146,7 @@ The autosummary above covers all top-level names; internal names
 - For the glossary: every term must appear somewhere in the codebase or
   design documents. Do not define a term that has no code evidence.
 - For the rest-api: never fabricate an endpoint, parameter, or status code.
-  Every item in every table comes from a `file:line` read.
+  Every item in every table comes from a direct read of the source definitions.
 
 OUTPUT: Write the completed `.md` file to `$TARGET_PATH`. No other
 files. No summary prose outside the file.

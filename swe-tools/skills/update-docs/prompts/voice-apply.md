@@ -66,7 +66,7 @@ Do not write to `$PAGE_PATH`.
 Read `$PAGE_PATH`. For each violation of rules 1–7:
 
 - Rewrite the sentence to conform.
-- Do not change factual content, `file:line` citations, admonitions, or headings
+- Do not change factual content, code citations, admonitions, or headings
   beyond what the voice rewrite requires.
 - Do not add or remove paragraphs; do not restructure sections.
 

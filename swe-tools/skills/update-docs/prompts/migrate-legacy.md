@@ -36,16 +36,16 @@ a behavior description. Do not trust any of them yet.
 ### Step 2 — Verify each claim against current source
 
 For each claim, locate the corresponding code or configuration and confirm
-whether the claim is still accurate. Note the `file:line` for every claim
-that holds. For a claim that no longer holds or cannot be confirmed, mark it
-**unsalvageable**.
+whether the claim is still accurate. Note where in the source every claim that
+holds is grounded (module and symbol). For a claim that no longer holds or
+cannot be confirmed, mark it **unsalvageable**.
 
 Do not reuse legacy prose verbatim. Even when a claim is accurate, re-derive
 the sentence from the current source so that voice and precision are correct.
 
 ### Step 3 — Reshape to the target page type
 
-Using the verified claims and their `file:line` references, author a page in
+Using the verified claims and their source locations, author a page in
 the shape prescribed by `$TARGET_TYPE` (see `assets/meta/documentation_guide.md`
 and the matching `prompts/generate-*.md` for the full ingredient list).
 
@@ -75,7 +75,8 @@ section at the end of your output under the heading `## Migration note`.
 ## Authoring rules
 
 - Re-verify every claim. Legacy prose is not evidence.
-- Ground every retained claim in a `file:line` reference.
+- Ground every retained claim in current source, cited at the module level
+  (class or function where that sharpens it) — never `file:line`.
 - Describe what the code does today, in present tense.
 - Label designed-but-unbuilt behavior with a self-contained `{caution}`
   admonition that states inline what is unbuilt and why, citing the

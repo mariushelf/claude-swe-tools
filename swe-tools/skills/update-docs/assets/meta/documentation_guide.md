@@ -86,10 +86,10 @@ reader already knows they are reading about a concept.
 For maintainers. Cover:
 
 - A conceptual anchor — a pointer up to the matching `concepts/` page.
-- Where it lives — module paths and `file:line` references.
+- Where it lives — module paths, and the class or function.
 - How it is built — the internal types and how they collaborate.
 - The replacement seam — the port or protocol that gates swapping the
-  implementation, with a `file:line`.
+  implementation, named by its module and symbol.
 - Invariants and edge cases.
 - The decisions — ADR cross-references.
 
@@ -163,8 +163,10 @@ pure asset directories are exempt.
   `../` links across directories break the strict build.
 - ADRs carry no `Status:` field. Reference them as links and let them hold the
   rationale rather than restating it.
-- Use `file:line` pointers freely in commit messages and pull requests,
-  sparingly in reader-facing prose.
+- In reader-facing prose, cite the module (and the class or function where it
+  sharpens the reference), never `file:line`: line numbers churn with every
+  commit and clutter the page. `file:line` pointers belong in commit messages,
+  pull requests, and audit findings — not in documentation.
 
 ### Voice
 

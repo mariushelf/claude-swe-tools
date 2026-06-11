@@ -37,13 +37,14 @@ Cover these ingredients:
 
 1. **Conceptual anchor.** One sentence orienting the reader — link *up*
    to the concept page: `` {doc}`/concepts/...` ``.
-2. **Where it lives.** Module path(s) and the entry-point symbol, with
-   `file:line` references (e.g. `src/your_package/adapters/client.py:42`).
+2. **Where it lives.** Module path(s) and the entry-point symbol — cite the
+   module and the class or function (e.g. `your_package.adapters.client.Client`),
+   not `file:line`.
 3. **How it is built.** Internal types, their roles, and how they
    collaborate. State invariants that must hold.
 4. **The replacement seam** — only if the project exposes one. If a
    port, protocol, or interface boundary separates this implementation
-   from its callers, describe it and cite `file:line` for the boundary
+   from its callers, describe it and name the module and symbol of the boundary
    definition and any registered implementations. If the project has no
    such seam, omit this ingredient; do not invent one.
 5. **Edge cases.** Non-obvious limits, failure modes, and what the
@@ -88,8 +89,9 @@ every field.
 
 ## Authoring rules
 
-- Ground every factual claim in a `file:line` reference. If a claim
-  cannot be grounded, do not make it.
+- Ground every factual claim in current source, cited at the module level
+  (class or function where that sharpens it) — never `file:line`. If a claim
+  cannot be grounded in current source, do not make it.
 - Describe what the code does today, in present tense.
 - If the codebase or the finding mentions designed-but-unbuilt behavior,
   label it with a self-contained `{caution}` admonition that states
@@ -99,7 +101,7 @@ every field.
   ```{caution}
   Designed but not implemented: <what>. <Where the design appears and
   why the code does not yet do this, e.g. "described in the module
-  docstring at file:line, but no implementation exists">.
+  docstring of `your_package.foo`, but no implementation exists">.
   ```
 
 - Cross-reference in-tree pages with the MyST `{doc}` role and

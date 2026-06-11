@@ -27,15 +27,15 @@ a sequence; use a flat list when order is not significant. Prefer
 imperative verbs: "run", "add", "open", "set".
 
 Derive every command, flag, make target, and config option from the
-actual repository. Cite the source with a `file:line` reference
-inline or in a comment. Do not invent defaults or flags that cannot
-be verified.
+actual repository. Cite the source by name — the file or make target — not a
+`file:line`. Do not invent defaults or flags that cannot be verified.
 
 ---
 
 ## Sources to consult for each variant
 
-Before writing, read the relevant files. Cite them with `file:line`.
+Before writing, read the relevant files. Cite them by name (path or make
+target), not by line number.
 
 | Variant | Primary sources |
 |---|---|
@@ -57,15 +57,16 @@ For `operations`: the audience is operators — people deploying, configuring,
 and monitoring the system in production. Cover deployment, configuration and
 environment variables, monitoring and alerting, and runbooks for common
 incidents, in whatever subset the repository actually evidences. Every claim
-is still grounded in a `file:line` reference (deploy configs, Dockerfiles,
-CI manifests, settings modules); omit any topic the repository contains no
-evidence for.
+is still grounded in current source (deploy configs, Dockerfiles, CI manifests,
+settings modules), cited by file or symbol name; omit any topic the repository
+contains no evidence for.
 
 ---
 
 ## Authoring rules
 
-- Ground every factual claim in a `file:line` reference.
+- Ground every factual claim in current source, cited by module or file name —
+  not `file:line`.
 - Describe what the code does today, in present tense.
 - Label designed-but-unbuilt steps with a self-contained `{caution}`
   admonition that states inline what is unbuilt and why, citing the

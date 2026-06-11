@@ -1,5 +1,6 @@
 PAGE_PATH: $PAGE_PATH      (absolute path to the page written or edited in this run)
-CITATIONS: $CITATIONS      (list of file:line references extracted from the page)
+CITATIONS: $CITATIONS      (the source locations — module/symbol — the U2 agent
+                            grounded each claim in)
 CHANGES: $CHANGES          (structured list of the edits this run made to the
                             page — claims introduced or altered, with rough
                             locations — or the sentinel `full-page` when the
@@ -28,21 +29,20 @@ Read `$PAGE_PATH` in full.
   immediately adjacent to those edits. Pre-existing prose elsewhere in the
   page is out of scope — do not verify it, and never modify it (see Step 4).
 
-Each in-scope claim should already carry a `file:line` citation; note any
+Each in-scope claim should already carry a module-level citation; note any
 that do not.
 
-### Step 2 — Check each citation
+### Step 2 — Check each claim against source
 
-For each `file:line` attached to an in-scope claim (from `$CITATIONS` and
-any others found in the in-scope text):
+For each in-scope claim, using its citation and the locations in `$CITATIONS`:
 
-1. Open the file at the cited line.
-2. Confirm that the surrounding code still supports the claim made in the prose.
+1. Open the cited module (and the class or function).
+2. Confirm that the current code still supports the claim made in the prose.
 3. Mark the claim **verified**, **drifted**, or **unverifiable**:
-   - **verified** — the code at `file:line` directly supports the prose.
+   - **verified** — the cited code directly supports the prose.
    - **drifted** — the code has changed; the prose no longer matches.
-   - **unverifiable** — no `file:line` exists for the claim, or the cited
-     location does not contain evidence for the claim.
+   - **unverifiable** — no source grounding exists for the claim, or the cited
+     location does not contain evidence for it.
 
 ### Step 3 — Build the drift list
 
@@ -51,7 +51,7 @@ each entry:
 
 - Quote the offending sentence from the page.
 - State whether it is drifted or unverifiable.
-- For drifted claims: state what the code actually says at `file:line`.
+- For drifted claims: state what the code actually says (cite the module/symbol).
 - For unverifiable claims: note that no grounding was found.
 
 If, while checking in-scope claims, a pre-existing claim (outside `$CHANGES`)
@@ -67,7 +67,7 @@ in place is text this run itself introduced (every claim, when `$CHANGES` is
 `full-page`; only the listed edits otherwise).
 
 - **Drifted claims introduced by this run**: rewrite the sentence to match
-  the current source. Update or add the `file:line` reference.
+  the current source. Update or correct the module-level citation.
 - **Unverifiable claims** (own or adjacent): keep the prose untouched and
   append a self-contained `{caution}` admonition immediately after it,
   stating what could not be verified and what was checked (one or two

@@ -177,7 +177,8 @@ Per the page's effective action, dispatch the matching prompt:
 
 A `touch-up` page receives *all* of its findings in one dispatch and is edited
 minimally — structure and untouched prose survive verbatim. Generation and
-migration write the page whole. Ground every claim in a `file:line` reference.
+migration write the page whole. Ground every claim in current source, cited at the module level
+(class or function where that sharpens it) — never `file:line`.
 Add mermaid for architecture and key workflows. Label designed-but-unbuilt
 behaviour with a self-contained `{caution}` admonition (what is unbuilt and
 why — no ledger file). **Greenfield skips ADR authoring** — create only an
@@ -220,7 +221,7 @@ created, migrated, corrected, and flagged for human follow-up.
 | `$LEGACY_PATH` | migrate-legacy | the finding's **Location** |
 | `$PAGE_PATH` | touch-up, self-verify, voice-apply | the page on disk |
 | `$CHANGES` | self-verify | the U2 agent's change list, or `full-page` |
-| `$CITATIONS` | self-verify | the `file:line` references the U2 agent emitted |
+| `$CITATIONS` | self-verify | the source citations (module/symbol) the U2 agent grounded its claims in |
 | `$FINDING_ACTION` | voice-apply | the page's effective action after the cap |
 | `$CHANGED_PAGES`, `$DRIFT_LISTS`, `$VOICE_REPORTS` | synthesizer | collected U2 page list, U3 drift lists, U4 voice reports |
 

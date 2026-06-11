@@ -88,7 +88,8 @@ blunt.
 2. **Patch / generate / migrate** — patch each `touch-up` page in place
    (structure and untouched prose survive verbatim); author each
    `create`/`overhaul` page from code (and legacy content when migrating).
-   Every claim is grounded in a `file:line`. Mermaid is used for architecture
+   Every claim is grounded in current source and cited at the module (or class)
+   level. Mermaid is used for architecture
    and key workflows. Designed-but-unbuilt behaviour is labelled with a
    self-contained `{caution}`. Greenfield repos get no invented ADR rationale;
    legacy ADRs migrate verbatim.
