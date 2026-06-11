@@ -1,5 +1,7 @@
 SCOPE: $SCOPE
-ARGUMENTS: $ARGUMENTS  (parsed for `scope:` and `out:` overrides)
+ARGUMENTS: $ARGUMENTS  (parsed for `scope:`, `since:`/`range:`, and `out:` overrides)
+WINDOW: $WINDOW          (a `<boundary>..HEAD` range, or "none")
+CHANGED_PATHS: $CHANGED_PATHS   (code/doc paths changed in the window, or "none")
 
 YOUR ROLE: Discovery scout (Wave A). Survey the repository — code first, docs
 second — and produce three outputs that every later agent in this run reuses.
@@ -10,6 +12,17 @@ only enough to build $PROJECT_CONTEXT (orientation), but restrict the
 site-map, the per-page action estimates, and the area lists for the lens
 fan-out to the scoped subtree. Frame the mode recommendation as a
 recommendation for that subtree only, not for the repository as a whole.
+
+**Recency window.** When WINDOW is not "none", you also receive CHANGED_PATHS —
+the code and doc paths changed since the boundary commit. The window **narrows
+the audit**, the same way `scope:` does: restrict the site-map and the lens
+area-lists to the **in-scope page set** — the doc pages changed in the window,
+plus the pages that should cover code changed in it. Pages the window did not
+touch are read-only context (consult them to resolve cross-references; never flag
+them). Within the in-scope set, mark each page whose covered code changed in the
+window while the page itself did **not** as `stale-risk` — the report sorts these
+first. The flag is a priority hint, not a verdict (a doc that was also edited can
+still be wrong), so it never changes which in-scope pages get audited.
 
 ---
 
@@ -67,6 +80,9 @@ Identify the public surface an audit must cover:
 Emit a table: pages that *should* exist in the target model vs. what currently
 exists. Columns: `target-path | current-path (or "missing") | action-estimate`.
 Use the action taxonomy: `touch-up`, `overhaul`, `create`, `leave`, `skip`.
+When WINDOW is active, the table lists **only the in-scope pages** (those the
+window touched). Add a `stale-risk?` column: `yes` if the page's covered code
+changed in the window while the page itself did not, blank otherwise.
 
 ## Step 5 — Mode recommendation
 

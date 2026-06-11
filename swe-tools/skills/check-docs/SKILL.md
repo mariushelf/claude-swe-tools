@@ -6,7 +6,7 @@ description: >
   assessment is wanted before anything is changed — before running
   update-docs, as a CI or pre-PR gate, or when inheriting an unfamiliar
   codebase. Produces a DOC_AUDIT.md and never touches a documentation page.
-argument-hint: "[scope: <path>] [out: <report-path>]"
+argument-hint: "[scope: <path>] [since: <ref|date>] [range: <a>..<b>] [out: <report-path>]"
 disable-model-invocation: false
 ---
 
@@ -45,6 +45,17 @@ package under `src/` (or the flat package).
   subtree. A code path is mapped to the docs pages that should cover it; a docs
   path is audited directly.
 - **`out:`** where to write the report. Default: `docs/reviews/<date>-doc-audit/DOC_AUDIT.md`.
+- **`since:`** a recency anchor — a ref, tag, sha, or date. Resolved to a
+  *boundary commit*; everything changed between it and `HEAD` is the **window**,
+  and the audit is narrowed to the documentation that window touches (see
+  *Recency narrows the audit*). A date resolves as `git rev-list -1 --before="<date>" <branch>` (the last
+  commit on/before that date) — never raw `git log --since`, whose ordering
+  rebases and squash-merges corrupt. **Given with no value, it defaults to the
+  commit that produced the newest existing `docs/reviews/**/DOC_AUDIT.md`**
+  (`git log -1 --format=%H -- <that file>`), so the natural anchor is "since the
+  last audit." If no prior report exists, a value is required.
+- **`range:`** an explicit `<a>..<b>` commit range, used verbatim instead of
+  deriving a boundary from `since:`.
 
 ### Scoped runs stay in their lane
 
@@ -54,6 +65,44 @@ discovery may consult them to resolve cross-references, but no lens flags them.
 In particular the structure lens does not report out-of-scope orphan pages or
 missing pairs; it assesses structure only within the scoped subtree. A scoped
 audit answers "what is missing or wrong *here*," not "is the whole site correct."
+
+### Recency narrows the audit
+
+`since:`/`range:` resolves to a **window** — the commits between a boundary and
+`HEAD` — and uses it to **scope the audit down to the documentation that change
+touched**. This is the cheap, focused path: point it at recent history and get
+back the doc debt *for those changes*, without paying to re-audit the whole site.
+
+The in-scope page set is the union of:
+
+- **doc pages changed in the window**, and
+- **doc pages that should cover code changed in the window** (resolved through
+  the site-map).
+
+Only those pages are audited. Code and pages the window did not touch are
+read-only context — discovery may consult them to resolve cross-references, but
+no lens flags them, exactly as under `scope:`.
+
+Two things the narrowing deliberately does **not** weaken:
+
+- **Each in-scope page is audited in full.** Scoping decides *which* pages are
+  checked, never *how thoroughly*. Every applicable lens still runs over each
+  in-scope page against current source — a page is never half-checked just
+  because only one of its claims sits near the change.
+- **The report is honest that it is partial.** A windowed run is a **partial
+  audit by design**, and the preamble says so up front. The absence of findings
+  means "nothing wrong in what changed," never "the docs are otherwise fine."
+  For a full-site verdict, run without `since:`/`range:`.
+
+Within the in-scope set, the **doc-diff signal** sets priority: code that churned
+in the window while its covering page did *not* is the likeliest stale page and
+sorts first. It is a priority hint, not a verdict — a page whose doc was also
+edited can still be wrong — so it changes ordering, not what gets audited.
+
+Resolve the window once, deterministically, in the orchestrator:
+`git diff --name-status -M <boundary>..HEAD`, split into code and doc paths
+(`-M` so pure renames register as path-only, low-priority churn). Combine with
+`scope:` to narrow further still — the in-scope set is then the intersection.
 
 ## The target documentation model
 
@@ -94,6 +143,13 @@ to a target home, and emits:
 2. A site-map: the pages that should exist, and where each existing doc belongs.
 3. An auto-estimated `mode` recommendation (`auto` / `touch-up` / `overhaul`).
 
+When a window is active, discovery also receives `$WINDOW` and `$CHANGED_PATHS`
+and restricts the site-map and the lens area-lists to the **in-scope page set** —
+the doc pages changed in the window plus the pages that should cover code changed
+in the window. It marks which of those pages cover churned code whose doc did
+*not* change (the likely-stale signal) so the report can sort them first. Pages
+the window did not touch become read-only context, exactly as under `scope:`.
+
 Discovery output stays in the conversation, not on disk.
 
 ### Wave B — Audit fan-out (parallel, cheap model)
@@ -133,6 +189,11 @@ and — for `create`/`overhaul` — a **Target** docname and page type. The repo
 also embeds the project-context paragraph, so `update-docs report:` consumes it
 without re-deriving anything. Write only the report file; touch no other file.
 
+When a window is active, pass `$WINDOW` and `$CHANGED_PATHS` to the report: every
+finding is in-scope by construction, so the report carries the partial-audit
+disclaimer (it audited only what the window touched, not the whole site) and
+sorts likely-stale pages — churned code whose covering doc did not change — first.
+
 ### Filling the prompts
 
 Every placeholder, and who provides it:
@@ -147,6 +208,8 @@ Every placeholder, and who provides it:
 | `$MODE_RECOMMENDATION` | report | discovery output 3, with its one-sentence rationale |
 | `$LENS_FINDINGS` | report | concatenated Wave B outputs |
 | `$OUT_PATH` | report | the parsed `out:` value or the dated default |
+| `$WINDOW` | discovery, report | the resolved `<boundary>..HEAD` range, or "none" |
+| `$CHANGED_PATHS` | discovery, report | the windowed change set (code/doc split), or "none" |
 
 ## The `action` taxonomy
 

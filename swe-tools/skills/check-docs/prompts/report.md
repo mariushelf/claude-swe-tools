@@ -3,6 +3,8 @@ SITE_MAP: $SITE_MAP             (discovery's target-vs-current page table)
 LENS_FINDINGS: $LENS_FINDINGS   (all Wave B output: coverage, drift, structure, voice)
 OUT_PATH: $OUT_PATH             (default: docs/reviews/<date>-doc-audit/DOC_AUDIT.md)
 MODE_RECOMMENDATION: $MODE_RECOMMENDATION   (from discovery: auto|touch-up|overhaul, with rationale)
+WINDOW: $WINDOW                 (a `<boundary>..HEAD` range, or "none")
+CHANGED_PATHS: $CHANGED_PATHS   (code/doc paths changed in the window, or "none")
 
 YOUR ROLE: Report synthesiser (Wave C). Merge the four lens outputs into one
 prioritised, deduplicated `DOC_AUDIT.md`. Write ONLY that file. Touch nothing
@@ -28,6 +30,13 @@ COV-001, COV-002 … DRIFT-001 … STRUCT-001 … VOICE-001 …
 **3 — Assign severity.** Use the severity from the originating lens. If lenses
 disagree, use the higher severity and note the conflict in the evidence field.
 
+**3b — Flag stale-risk for ordering** (only when `WINDOW` ≠ "none"). Every
+finding is already in-scope — the audit was narrowed to the window — so do **not**
+tag findings `recent` and do **not** boost severity. Instead, mark each finding
+whose code changed in the window while its covering doc page did **not** (the
+site-map's `stale-risk` column) as a **stale-risk** priority. This flag affects
+only the sort order in step 5; it never changes severity and never drops a finding.
+
 **4 — Assign targets.** Every `create` and `overhaul` finding must carry a
 **Target** line: the destination docname (source-root-relative, e.g.
 `concepts/clustering.md`) and page type, resolved from `$SITE_MAP`. For
@@ -35,7 +44,8 @@ disagree, use the higher severity and note the conflict in the evidence field.
 be omitted.
 
 **5 — Sort.** Group findings by type in the order coverage, drift, structure,
-voice; within each type, order high → medium → low.
+voice; within each type, order high → medium → low. When `WINDOW` is active,
+place stale-risk findings (step 3b) before the rest inside each severity band.
 
 **6 — Write the report** to `$OUT_PATH`, using the template below exactly.
 `leave` findings stay in the body — they carry information for humans (e.g. an
@@ -52,10 +62,20 @@ The report must begin with this preamble verbatim (fill in the blanks):
 
 Generated: <ISO date>
 Repository: <repo root path>
+Window: <the WINDOW range, or "whole repository (no recency window)">
 
 ## How to use this report
 
 This report is READ-ONLY output. No documentation files were changed.
+
+<INCLUDE THIS BLOCKQUOTE VERBATIM ONLY WHEN WINDOW ≠ "none"; OMIT IT ENTIRELY OTHERWISE:>
+> **Partial audit — not a clean bill of health.** This run was *narrowed* to the
+> documentation touched by changes in `<WINDOW>`: only pages changed in the window,
+> or pages covering code that changed in it, were audited. Each of those pages was
+> checked in full against current source, but **pages outside the window were not
+> audited at all** — their absence here says nothing about whether they are correct.
+> Read this as "what changed lately that needs doc work." For a full-site verdict,
+> re-run without `since:`/`range:`.
 
 Each finding heading carries an `action` field auto-estimated by the audit:
 
@@ -105,6 +125,15 @@ update-docs reads it from here instead of re-deriving it>
 | voice     |      |        |     |       |       |
 | **total** |      |        |     |       |       |
 
+<INCLUDE THIS SECTION ONLY WHEN WINDOW ≠ "none"; OMIT IT ENTIRELY OTHERWISE:>
+## Scope of this audit (window: <WINDOW>)
+
+This run audited **only** the documentation the window touched — every other page
+in the repository was left unaudited. List the in-scope pages here (from the
+site-map): the doc pages changed in `<WINDOW>`, and the pages that should cover
+code changed in it. Mark each `stale-risk` where its code changed but its covering
+doc did not. This is the exact boundary of what the findings below cover.
+
 ## Findings
 ```
 
@@ -119,6 +148,10 @@ must use exactly this format:
 **Evidence:** <the doc claim and/or the contradicting code, with file:line>
 **Fix:** <what update-docs should do>
 ```
+
+A stale-risk finding (step 3b) appends ` · stale-risk` to its heading, e.g.
+`### DRIFT-002 · drift · severity: high · action: touch-up · stale-risk`. Omit the
+tag entirely when `WINDOW` is "none".
 
 ID prefixes: COV, DRIFT, STRUCT, VOICE. Number sequentially within each type.
 **Target** is mandatory for `create` and `overhaul` findings (docname plus one
