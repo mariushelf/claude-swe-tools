@@ -51,7 +51,7 @@ A read-only audit of a Python repository's documentation against its source code
 
 The report is the contract with the writer skill, `update-docs`: every finding carries a per-page `action` a human can edit, and `update-docs` consumes the curated report. Mirrors `deep-code-review` (read-only, emits a findings doc) — safe to run anywhere, including CI or a repo nobody owns.
 
-`since:`/`range:` overlay a **recency window** (default anchor: the last `DOC_AUDIT.md`) that prioritises findings on recently-changed code — boosting and sorting them, and surfacing pages whose code churned but whose docs did not. It prioritises without restricting: all four lenses still run against current source, and a windowed run is explicitly never treated as a clean bill of health for the whole site.
+`since:`/`range:` anchor a **recency window** (default anchor: the last `DOC_AUDIT.md`) and **narrow the audit to the docs that window touched** — the pages changed in it plus the pages covering code changed in it. It is the cheap, focused path: each in-scope page is still audited in full against current source, pages whose code churned but whose docs did not are flagged `stale-risk` and sorted first, and the report opens with a disclaimer that a windowed run is a partial audit, never a clean bill of health for the whole site.
 
 **Usage:**
 ```

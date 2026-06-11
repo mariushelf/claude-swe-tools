@@ -31,28 +31,28 @@ one report:
 - `scope:` limits the audit to a path. Default: `docs/` plus the package's public
   surface.
 - `out:` sets the report path. Default: `docs/reviews/<date>-doc-audit/DOC_AUDIT.md`.
-- `since:` / `range:` prioritise (do not restrict) by recency — see below.
+- `since:` / `range:` narrow the audit to docs touched by recent changes — see below.
 
-## Prioritising recent changes
+## Auditing just what changed
 
 `since:<ref|date>` (or `range:<a>..<b>`) anchors a **window** — everything changed
-between that boundary and `HEAD`. Given with no value, `since:` defaults to the
-commit that produced the last `DOC_AUDIT.md`, so the natural anchor is *"what's
-changed since the last audit."* A date resolves to the boundary commit on/before
-it (`git rev-list -1 --before=…`), not a fragile `git log --since`.
+between that boundary and `HEAD` — and **narrows the audit to the documentation
+that window touched**. Given with no value, `since:` defaults to the commit that
+produced the last `DOC_AUDIT.md`, so the natural anchor is *"what's changed since
+the last audit."* A date resolves to the boundary commit on/before it
+(`git rev-list -1 --before=…`), not a fragile `git log --since`.
 
-The window is a **prioritisation lens, not a filter.** All four lenses still
-measure the docs against current source; recency never substitutes for the drift
-check. Findings inside the window are tagged `recent`, boosted a severity step,
-and sorted to the top under a "Recent changes" section. A cheap "doc diff or lack
-thereof" signal — code that churned while its covering page did not — surfaces
-likely-stale pages, but only as a hint: a touched doc can still be wrong, and
-drift can appear with no code churn, so nothing is skipped.
+This is the cheap, focused path. It audits only the doc pages changed in the
+window plus the pages that should cover code changed in it. Each of those pages is
+still checked **in full** against current source — every applicable lens runs, so
+an in-scope page is never half-audited. Within the in-scope set, pages whose code
+churned while their doc did not are flagged `stale-risk` and sorted first.
 
-Because the window hides nothing, you can add `scope:` to bound cost on a big
-repo — but then it is a partial audit. **A windowed run is never a clean bill of
-health for the whole site**, and its report says so up front. Read it as "what
-changed lately that needs doc work," not "the docs are otherwise fine."
+A windowed run is a **partial audit by design.** Its report opens with a
+disclaimer saying so: pages the window did not touch were not audited at all, so
+their absence from the findings means nothing. Read it as "what changed lately
+that needs doc work," not "the docs are otherwise fine" — for a full-site verdict,
+run without `since:`/`range:`. Combine with `scope:` to narrow further still.
 
 ## The report is the contract
 

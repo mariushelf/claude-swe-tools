@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 ## [0.7.0] - 2026-06-12
 
 ### Added
-- `swe-tools:check-docs` gains `since:` / `range:` arguments: a recency window (default anchor: the commit that produced the last `DOC_AUDIT.md`) that *prioritises* findings on recently-changed code rather than restricting the audit. In-window findings are tagged `recent`, boosted a severity step, and sorted to the top under a "Recent changes" section; code that churned while its covering page did not is surfaced as a likely-stale signal. Dates resolve to a boundary commit (`git rev-list -1 --before=…`), not `git log --since`. All four lenses still run against current source, and a windowed report is explicitly never a clean bill of health for the whole site
+- `swe-tools:check-docs` gains `since:` / `range:` arguments: a recency window (default anchor: the commit that produced the last `DOC_AUDIT.md`) that *narrows* the audit to the documentation the window touched — the doc pages changed in it plus the pages that should cover code changed in it — for a cheap, focused run. Each in-scope page is still audited in full against current source; pages whose code churned while their doc did not are flagged `stale-risk` and sorted first. Dates resolve to a boundary commit (`git rev-list -1 --before=…`), not `git log --since`. A windowed run is a partial audit by design, and its report opens with a disclaimer that it is never a clean bill of health for the whole site
 
 ## [0.6.0] - 2026-06-11
 

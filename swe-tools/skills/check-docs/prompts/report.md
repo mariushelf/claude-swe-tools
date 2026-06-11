@@ -30,11 +30,12 @@ COV-001, COV-002 … DRIFT-001 … STRUCT-001 … VOICE-001 …
 **3 — Assign severity.** Use the severity from the originating lens. If lenses
 disagree, use the higher severity and note the conflict in the evidence field.
 
-**3b — Apply the recency window** (only when `WINDOW` ≠ "none"). Tag every
-finding whose **Location** or **Target** falls inside `CHANGED_PATHS` as
-`recent`, and raise its severity one step (low → medium → high, capped at high).
-Out-of-window findings are left untouched — they are real and still reported,
-just not prioritised. Tagging never drops a finding.
+**3b — Flag stale-risk for ordering** (only when `WINDOW` ≠ "none"). Every
+finding is already in-scope — the audit was narrowed to the window — so do **not**
+tag findings `recent` and do **not** boost severity. Instead, mark each finding
+whose code changed in the window while its covering doc page did **not** (the
+site-map's `stale-risk` column) as a **stale-risk** priority. This flag affects
+only the sort order in step 5; it never changes severity and never drops a finding.
 
 **4 — Assign targets.** Every `create` and `overhaul` finding must carry a
 **Target** line: the destination docname (source-root-relative, e.g.
@@ -44,7 +45,7 @@ be omitted.
 
 **5 — Sort.** Group findings by type in the order coverage, drift, structure,
 voice; within each type, order high → medium → low. When `WINDOW` is active,
-place `recent` findings before the rest inside each severity band.
+place stale-risk findings (step 3b) before the rest inside each severity band.
 
 **6 — Write the report** to `$OUT_PATH`, using the template below exactly.
 `leave` findings stay in the body — they carry information for humans (e.g. an
@@ -68,12 +69,13 @@ Window: <the WINDOW range, or "whole repository (no recency window)">
 This report is READ-ONLY output. No documentation files were changed.
 
 <INCLUDE THIS BLOCKQUOTE VERBATIM ONLY WHEN WINDOW ≠ "none"; OMIT IT ENTIRELY OTHERWISE:>
-> **Windowed run — not a clean bill of health.** This audit *prioritised* changes
-> in `<WINDOW>`; findings tagged `recent` fall inside it. Everything in scope was
-> still checked against current source, but **the absence of a `recent` finding is
-> not a guarantee the rest of the docs are correct** — drift older than the window,
-> or in a page edited for an unrelated reason, will not be flagged `recent`. For a
-> full-site verdict, re-run without `since:`/`range:`.
+> **Partial audit — not a clean bill of health.** This run was *narrowed* to the
+> documentation touched by changes in `<WINDOW>`: only pages changed in the window,
+> or pages covering code that changed in it, were audited. Each of those pages was
+> checked in full against current source, but **pages outside the window were not
+> audited at all** — their absence here says nothing about whether they are correct.
+> Read this as "what changed lately that needs doc work." For a full-site verdict,
+> re-run without `since:`/`range:`.
 
 Each finding heading carries an `action` field auto-estimated by the audit:
 
@@ -124,12 +126,13 @@ update-docs reads it from here instead of re-deriving it>
 | **total** |      |        |     |       |       |
 
 <INCLUDE THIS SECTION ONLY WHEN WINDOW ≠ "none"; OMIT IT ENTIRELY OTHERWISE:>
-## Recent changes (window: <WINDOW>)
+## Scope of this audit (window: <WINDOW>)
 
-The code areas that changed in the window and their documentation status — the
-`recent` findings below, plus any code that changed while its covering page did
-**not** (stale-risk, from the site-map's `recent?` column). This section is a
-prioritised reading order, not an exhaustive list of doc problems.
+This run audited **only** the documentation the window touched — every other page
+in the repository was left unaudited. List the in-scope pages here (from the
+site-map): the doc pages changed in `<WINDOW>`, and the pages that should cover
+code changed in it. Mark each `stale-risk` where its code changed but its covering
+doc did not. This is the exact boundary of what the findings below cover.
 
 ## Findings
 ```
@@ -146,8 +149,8 @@ must use exactly this format:
 **Fix:** <what update-docs should do>
 ```
 
-A finding tagged `recent` in step 3b appends ` · recent` to its heading, e.g.
-`### DRIFT-002 · drift · severity: high · action: touch-up · recent`. Omit the
+A stale-risk finding (step 3b) appends ` · stale-risk` to its heading, e.g.
+`### DRIFT-002 · drift · severity: high · action: touch-up · stale-risk`. Omit the
 tag entirely when `WINDOW` is "none".
 
 ID prefixes: COV, DRIFT, STRUCT, VOICE. Number sequentially within each type.
