@@ -6,7 +6,7 @@ description: >
   assessment is wanted before anything is changed — before running
   update-docs, as a CI or pre-PR gate, or when inheriting an unfamiliar
   codebase. Produces a DOC_AUDIT.md and never touches a documentation page.
-argument-hint: "[scope: <path>] [out: <report-path>]"
+argument-hint: "[scope: <path>] [since: <ref|date>] [range: <a>..<b>] [out: <report-path>]"
 disable-model-invocation: false
 ---
 
@@ -45,6 +45,16 @@ package under `src/` (or the flat package).
   subtree. A code path is mapped to the docs pages that should cover it; a docs
   path is audited directly.
 - **`out:`** where to write the report. Default: `docs/reviews/<date>-doc-audit/DOC_AUDIT.md`.
+- **`since:`** a recency anchor — a ref, tag, sha, or date. Resolved to a
+  *boundary commit*; everything changed between it and `HEAD` is the **window**.
+  A date resolves as `git rev-list -1 --before="<date>" <branch>` (the last
+  commit on/before that date) — never raw `git log --since`, whose ordering
+  rebases and squash-merges corrupt. **Given with no value, it defaults to the
+  commit that produced the newest existing `docs/reviews/**/DOC_AUDIT.md`**
+  (`git log -1 --format=%H -- <that file>`), so the natural anchor is "since the
+  last audit." If no prior report exists, a value is required.
+- **`range:`** an explicit `<a>..<b>` commit range, used verbatim instead of
+  deriving a boundary from `since:`.
 
 ### Scoped runs stay in their lane
 
@@ -54,6 +64,32 @@ discovery may consult them to resolve cross-references, but no lens flags them.
 In particular the structure lens does not report out-of-scope orphan pages or
 missing pairs; it assesses structure only within the scoped subtree. A scoped
 audit answers "what is missing or wrong *here*," not "is the whole site correct."
+
+### Recency is a lens, not a filter
+
+`since:`/`range:` defines a **window** and overlays it on the audit; it does
+**not** narrow what is audited. The four lenses still measure the docs against
+*current source* exactly as before — recency never substitutes for the drift
+check. What the window changes:
+
+- **Prioritisation.** A finding whose page or code falls inside the window is
+  tagged `recent`, sorted to the top, and has its severity raised one step
+  (capped at high). The report opens with a "Recent changes" section.
+- **The doc-diff signal.** Discovery flags code paths that changed in the window
+  whose covering doc page did *not* — a cheap "likely-stale" heuristic. It is a
+  **prioritisation signal, not a verdict**: a touched doc can still be wrong, and
+  drift can appear with no code churn at all, so every applicable lens runs
+  regardless of churn.
+
+Because the window hides nothing, it is safe to combine with `scope:` when you
+also want to bound cost — but a `scope:`d run is a partial audit, and the report
+says so. **A windowed run is never a clean bill of health for the whole site**
+(the report preamble states this): read it as "what changed lately that needs
+doc work," not "the docs are otherwise fine."
+
+Resolve the window once, deterministically, in the orchestrator:
+`git diff --name-status -M <boundary>..HEAD`, split into code and doc paths
+(`-M` so pure renames register as path-only, low-priority churn).
 
 ## The target documentation model
 
@@ -94,6 +130,11 @@ to a target home, and emits:
 2. A site-map: the pages that should exist, and where each existing doc belongs.
 3. An auto-estimated `mode` recommendation (`auto` / `touch-up` / `overhaul`).
 
+When a window is active, discovery also receives `$WINDOW` and `$CHANGED_PATHS`
+and marks which site-map pages cover recently-churned code — and which churned
+code has no matching doc change (the likely-stale signal). This is prioritisation
+input only; it never removes a page from the audit.
+
 Discovery output stays in the conversation, not on disk.
 
 ### Wave B — Audit fan-out (parallel, cheap model)
@@ -133,6 +174,11 @@ and — for `create`/`overhaul` — a **Target** docname and page type. The repo
 also embeds the project-context paragraph, so `update-docs report:` consumes it
 without re-deriving anything. Write only the report file; touch no other file.
 
+When a window is active, pass `$WINDOW` and `$CHANGED_PATHS` to the report: it
+tags in-window findings `recent`, raises and sorts them, opens with a "Recent
+changes" section, and carries the windowed-run disclaimer (the run is not a
+clean bill of health for the whole site).
+
 ### Filling the prompts
 
 Every placeholder, and who provides it:
@@ -147,6 +193,8 @@ Every placeholder, and who provides it:
 | `$MODE_RECOMMENDATION` | report | discovery output 3, with its one-sentence rationale |
 | `$LENS_FINDINGS` | report | concatenated Wave B outputs |
 | `$OUT_PATH` | report | the parsed `out:` value or the dated default |
+| `$WINDOW` | discovery, report | the resolved `<boundary>..HEAD` range, or "none" |
+| `$CHANGED_PATHS` | discovery, report | the windowed change set (code/doc split), or "none" |
 
 ## The `action` taxonomy
 

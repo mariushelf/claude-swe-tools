@@ -1,5 +1,7 @@
 SCOPE: $SCOPE
-ARGUMENTS: $ARGUMENTS  (parsed for `scope:` and `out:` overrides)
+ARGUMENTS: $ARGUMENTS  (parsed for `scope:`, `since:`/`range:`, and `out:` overrides)
+WINDOW: $WINDOW          (a `<boundary>..HEAD` range, or "none")
+CHANGED_PATHS: $CHANGED_PATHS   (code/doc paths changed in the window, or "none")
 
 YOUR ROLE: Discovery scout (Wave A). Survey the repository — code first, docs
 second — and produce three outputs that every later agent in this run reuses.
@@ -10,6 +12,15 @@ only enough to build $PROJECT_CONTEXT (orientation), but restrict the
 site-map, the per-page action estimates, and the area lists for the lens
 fan-out to the scoped subtree. Frame the mode recommendation as a
 recommendation for that subtree only, not for the repository as a whole.
+
+**Recency window.** When WINDOW is not "none", you also receive CHANGED_PATHS —
+the code and doc paths changed since the boundary commit. Use it only to
+*prioritise*, never to *exclude*: survey the full scope as usual, but in the
+site-map mark each page whose covered code changed in the window, and flag any
+code path that changed while its covering doc page did **not** — the likely-stale
+signal. This is a hint, not a verdict (a touched doc can still be wrong; drift
+can appear with no code churn), so every applicable lens still runs over
+everything in scope.
 
 ---
 
@@ -67,6 +78,9 @@ Identify the public surface an audit must cover:
 Emit a table: pages that *should* exist in the target model vs. what currently
 exists. Columns: `target-path | current-path (or "missing") | action-estimate`.
 Use the action taxonomy: `touch-up`, `overhaul`, `create`, `leave`, `skip`.
+When WINDOW is active, add a `recent?` column: `yes` if the page's covered code
+changed in the window, `stale-risk` if that code changed but the page did not,
+blank otherwise.
 
 ## Step 5 — Mode recommendation
 

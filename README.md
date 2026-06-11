@@ -51,10 +51,14 @@ A read-only audit of a Python repository's documentation against its source code
 
 The report is the contract with the writer skill, `update-docs`: every finding carries a per-page `action` a human can edit, and `update-docs` consumes the curated report. Mirrors `deep-code-review` (read-only, emits a findings doc) — safe to run anywhere, including CI or a repo nobody owns.
 
+`since:`/`range:` overlay a **recency window** (default anchor: the last `DOC_AUDIT.md`) that prioritises findings on recently-changed code — boosting and sorting them, and surfacing pages whose code churned but whose docs did not. It prioritises without restricting: all four lenses still run against current source, and a windowed run is explicitly never treated as a clean bill of health for the whole site.
+
 **Usage:**
 ```
 /check-docs
 /check-docs scope: src/clustering
+/check-docs since: v1.4.0
+/check-docs since: 2026-01-01
 /check-docs out: docs/reviews/doc-audit.md
 ```
 

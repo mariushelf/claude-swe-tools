@@ -24,11 +24,35 @@ one report:
 /check-docs
 /check-docs scope:docs/source/architecture
 /check-docs out:/tmp/audit.md
+/check-docs since:v1.4.0
+/check-docs since:2026-01-01
 ```
 
 - `scope:` limits the audit to a path. Default: `docs/` plus the package's public
   surface.
 - `out:` sets the report path. Default: `docs/reviews/<date>-doc-audit/DOC_AUDIT.md`.
+- `since:` / `range:` prioritise (do not restrict) by recency — see below.
+
+## Prioritising recent changes
+
+`since:<ref|date>` (or `range:<a>..<b>`) anchors a **window** — everything changed
+between that boundary and `HEAD`. Given with no value, `since:` defaults to the
+commit that produced the last `DOC_AUDIT.md`, so the natural anchor is *"what's
+changed since the last audit."* A date resolves to the boundary commit on/before
+it (`git rev-list -1 --before=…`), not a fragile `git log --since`.
+
+The window is a **prioritisation lens, not a filter.** All four lenses still
+measure the docs against current source; recency never substitutes for the drift
+check. Findings inside the window are tagged `recent`, boosted a severity step,
+and sorted to the top under a "Recent changes" section. A cheap "doc diff or lack
+thereof" signal — code that churned while its covering page did not — surfaces
+likely-stale pages, but only as a hint: a touched doc can still be wrong, and
+drift can appear with no code churn, so nothing is skipped.
+
+Because the window hides nothing, you can add `scope:` to bound cost on a big
+repo — but then it is a partial audit. **A windowed run is never a clean bill of
+health for the whole site**, and its report says so up front. Read it as "what
+changed lately that needs doc work," not "the docs are otherwise fine."
 
 ## The report is the contract
 
