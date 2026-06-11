@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.6.0] - 2026-06-11
+
+### Added
+- `swe-tools:document-pr` skill: PR-scoped documentation gate that leans on `check-docs` and `update-docs`. Resolves a pull request's diff and either validates the doc edits the PR already ships (against the code it changes, without failing the PR on pre-existing drift or rewriting the author's prose) or writes the docs a change with no doc edits needs — always scoped to the diff, never the whole repository
+
 ## [0.5.0] - 2026-06-11
 
 ### Added

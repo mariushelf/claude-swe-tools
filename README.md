@@ -75,6 +75,19 @@ A global `mode` flag (`auto`/`touch-up`/`overhaul`) sets the default invasivenes
 
 Output: written and build-verified pages under `docs/`. See the [update-docs README](swe-tools/skills/update-docs/README.md).
 
+#### document-pr
+
+Keeps a single pull request's documentation in step with its diff. It is the PR-scoped front door to `check-docs` / `update-docs`: it resolves the PR's changed surface, then **validates** the doc edits the PR already carries (against the code it changes, never failing the PR on pre-existing drift) or **writes** the docs the change needs — always scoped to the diff, never the whole site. The decision is driven by the diff: if the PR already edits rendered docs it validates them (and never rewrites the author's prose); if it ships no docs it writes them; if it touches no documented surface it does nothing.
+
+**Usage:**
+```
+/document-pr
+/document-pr pr: 142
+/document-pr mode: validate scope: src/clustering
+```
+
+Output: a PR-scoped verdict (validate) or pages written and build-verified by `update-docs` (update). See the [document-pr README](swe-tools/skills/document-pr/README.md).
+
 #### working-on-parallel-issues
 
 Orchestrate multiple GitHub issues in parallel — one worktree-isolated agent per issue, each producing a PR with green CI.
