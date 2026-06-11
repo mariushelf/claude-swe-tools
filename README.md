@@ -45,6 +45,36 @@ Multi-wave fan-out of read-only specialist agents that audit a codebase for sile
 
 Output: `docs/reviews/<YYYY-MM-DD>-deep-review/SYNTHESIS.md` plus per-theme appendix files. See the [deep-code-review README](swe-tools/skills/deep-code-review/README.md) for the design philosophy and theme catalogue.
 
+#### check-docs
+
+A read-only audit of a Python repository's documentation against its source code. It surveys the repo, fans out cheap parallel agents across four lenses — coverage, drift, structure, voice — and synthesises a single prioritised `DOC_AUDIT.md`. **It never touches the rendered docs tree or any existing file** — the report is the only thing it writes.
+
+The report is the contract with the writer skill, `update-docs`: every finding carries a per-page `action` a human can edit, and `update-docs` consumes the curated report. Mirrors `deep-code-review` (read-only, emits a findings doc) — safe to run anywhere, including CI or a repo nobody owns.
+
+**Usage:**
+```
+/check-docs
+/check-docs scope: src/clustering
+/check-docs out: docs/reviews/doc-audit.md
+```
+
+Output: `docs/reviews/DOC_AUDIT.md` (unrendered). See the [check-docs README](swe-tools/skills/check-docs/README.md).
+
+#### update-docs
+
+The writer counterpart to `check-docs`. Creates, repairs, and restructures a Python repository's documentation against its source code, then wires and build-verifies it. Handles both greenfield repos (derive docs from code) and legacy repos (re-verify facts, restructure into a Sphinx/Diátaxis layout, rewrite to voice). It can consume a curated `DOC_AUDIT.md` from `check-docs`, or run standalone.
+
+A global `mode` flag (`auto`/`touch-up`/`overhaul`) sets the default invasiveness; per-finding `action`s from the audit refine it page by page.
+
+**Usage:**
+```
+/update-docs
+/update-docs report: docs/reviews/DOC_AUDIT.md
+/update-docs mode: touch-up scope: src/clustering
+```
+
+Output: written and build-verified pages under `docs/`. See the [update-docs README](swe-tools/skills/update-docs/README.md).
+
 #### working-on-parallel-issues
 
 Orchestrate multiple GitHub issues in parallel — one worktree-isolated agent per issue, each producing a PR with green CI.
