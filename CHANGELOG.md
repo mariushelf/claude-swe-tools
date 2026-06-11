@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.5.0] - 2026-06-11
+
+### Added
+- `swe-tools:check-docs` skill: read-only documentation audit for Python repositories — fans out parallel agents across four lenses (coverage, drift, structure, voice) and synthesises a single prioritised `DOC_AUDIT.md`; never writes to the docs tree
+- `swe-tools:update-docs` skill: writer counterpart to `check-docs` — creates, repairs, and restructures docs against source code into a Sphinx/Diátaxis layout, then wires and build-verifies them; handles greenfield and legacy repos and can consume a curated `DOC_AUDIT.md`
+
 ## [0.4.0] - 2026-05-11
 
 ### Added

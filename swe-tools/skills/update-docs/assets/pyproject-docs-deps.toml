@@ -1,0 +1,16 @@
+# ---------------------------------------------------------------------------
+# Docs dependency group — merge this block into the target project's
+# pyproject.toml under [dependency-groups]. Requires PEP 735 support
+# (pip >= 25.1 / uv >= 0.4.27).
+#
+# Install with: uv sync --group docs
+# ---------------------------------------------------------------------------
+
+[dependency-groups]
+docs = [
+    "sphinx>=7",
+    "myst-parser>=2",
+    "sphinxcontrib-mermaid>=0.9",
+    "sphinx-autobuild>=2024.4",
+    "pydata-sphinx-theme>=0.17.1",
+]
