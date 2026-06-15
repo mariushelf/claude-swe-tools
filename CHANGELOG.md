@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Removed
+- Lingering `claude-vault` references from the README and the marketplace description. The plugin itself was removed in 0.3.0; use the memsearch plugin instead
+
 ## [0.7.0] - 2026-06-12
 
 ### Added
