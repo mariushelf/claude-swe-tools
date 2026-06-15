@@ -1,7 +1,7 @@
 {
   "name": "claude-swe-tools",
   "metadata": {
-    "description": "Software engineering skills for Claude Code: design advisory teams, parallel issue workflows, and a persistent knowledge vault"
+    "description": "Software engineering skills for Claude Code: design advisory teams and parallel issue workflows"
   },
   "owner": {
     "name": "Marius Helf",
