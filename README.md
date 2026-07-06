@@ -6,11 +6,12 @@ Beta: use at your own risk and provide feedback!
 
 ## Plugins
 
-This marketplace package contains one installable plugin:
+This marketplace package contains two installable plugins:
 
 | Plugin | Description | Install command |
 |--------|-------------|-----------------|
 | **swe-tools** | Design advisor team and parallel issue workflows | `claude plugin install swe-tools@claude-swe-tools` |
+| **grilling** | A relentless interview to sharpen a plan or design | `claude plugin install grilling@claude-swe-tools` |
 
 ## Skills
 
@@ -109,6 +110,28 @@ Recommended to run in a dev container or other isolated environment with
 
 ![working-on-parallel-issues screenshot](swe-tools/docs/working-on-parallel-issues-screenshot.png)
 
+### grilling
+
+Vendored from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License, Matt Pocock) — see [grilling/NOTICE.md](grilling/NOTICE.md) for the pinned commit and attribution.
+
+#### grilling / grill-me
+
+A relentless, one-question-at-a-time interview that stress-tests a plan or design before you commit to it. `grill-me` is the entry point; it runs a `grilling` session.
+
+**Usage:** `/grill-me` or `/grilling`
+
+#### grill-with-docs
+
+Same relentless interview, but also produces ADRs and a glossary (`CONTEXT.md`) as it goes, via the `domain-modeling` skill.
+
+**Usage:** `/grill-with-docs`
+
+**Note:** downstream projects with their own ADR conventions may want to reconcile format/location — `domain-modeling` writes using its own `ADR-FORMAT.md`/`CONTEXT-FORMAT.md`.
+
+#### domain-modeling
+
+Leaf skill used by `grill-with-docs` to write ADRs and maintain a `CONTEXT.md` glossary. Not typically invoked directly.
+
 ## Installation
 
 First, add the marketplace:
@@ -117,10 +140,11 @@ First, add the marketplace:
 claude plugin marketplace add mariushelf/claude-swe-tools
 ```
 
-Then install the plugin:
+Then install the plugin(s) you want:
 
 ```bash
 claude plugin install swe-tools@claude-swe-tools
+claude plugin install grilling@claude-swe-tools
 ```
 
 Or interactively inside Claude Code:
@@ -128,6 +152,7 @@ Or interactively inside Claude Code:
 ```
 /plugin marketplace add mariushelf/claude-swe-tools
 /plugin install swe-tools@claude-swe-tools
+/plugin install grilling@claude-swe-tools
 ```
 
 ## License
