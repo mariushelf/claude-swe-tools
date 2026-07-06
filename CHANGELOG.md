@@ -4,6 +4,9 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- `grilling` plugin (v0.1.0): `grill-me`/`grilling` (a relentless one-question-at-a-time interview to sharpen a plan or design) and `grill-with-docs`/`domain-modeling` (the same interview, plus ADRs and a `CONTEXT.md` glossary written along the way). Vendored from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT, Matt Pocock), pinned to commit `16a2a5c` — see `grilling/NOTICE.md`
+
 ### Removed
 - Lingering `claude-vault` references from the README and the marketplace description. The plugin itself was removed in 0.3.0; use the memsearch plugin instead
 

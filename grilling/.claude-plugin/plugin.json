@@ -1,0 +1,12 @@
+{
+  "name": "grilling",
+  "version": "0.1.0",
+  "description": "A relentless interview to sharpen a plan or design, optionally producing ADRs and a glossary as it goes",
+  "author": {
+    "name": "Marius Helf",
+    "email": "marius@happyyeti.tech"
+  },
+  "repository": "https://github.com/mariushelf/claude-swe-tools",
+  "license": "MIT",
+  "keywords": ["skills", "interview", "requirements", "design", "adr", "domain-modeling"]
+}

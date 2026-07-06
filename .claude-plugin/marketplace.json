@@ -21,6 +21,20 @@
       "license": "MIT",
       "keywords": ["skills", "design", "architecture", "parallel-issues", "workflows"],
       "category": "development"
+    },
+    {
+      "name": "grilling",
+      "source": "./grilling",
+      "description": "A relentless interview to sharpen a plan or design, optionally producing ADRs and a glossary as it goes",
+      "version": "0.1.0",
+      "author": {
+        "name": "Marius Helf",
+        "email": "marius@happyyeti.tech"
+      },
+      "homepage": "https://github.com/mariushelf/claude-swe-tools",
+      "license": "MIT",
+      "keywords": ["skills", "interview", "requirements", "design", "adr", "domain-modeling"],
+      "category": "development"
     }
   ]
 }
