@@ -12,7 +12,6 @@
       "name": "swe-tools",
       "source": "./swe-tools",
       "description": "Design advisor team and parallel GitHub issue workflows",
-      "version": "0.7.0",
       "author": {
         "name": "Marius Helf",
         "email": "marius@happyyeti.tech"
@@ -26,7 +25,6 @@
       "name": "grilling",
       "source": "./grilling",
       "description": "A relentless interview to sharpen a plan or design, optionally producing ADRs and a glossary as it goes",
-      "version": "0.1.0",
       "author": {
         "name": "Marius Helf",
         "email": "marius@happyyeti.tech"
