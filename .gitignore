@@ -19,3 +19,6 @@ refs
 # Claude Code local
 .claude/
 /.memsearch/
+
+# graphify code graph (rebuilt locally per worktree)
+graphify-out/
