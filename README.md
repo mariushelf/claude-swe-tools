@@ -155,6 +155,18 @@ Or interactively inside Claude Code:
 /plugin install grilling@claude-swe-tools
 ```
 
+## Development
+
+To keep a local code graph in `graphify-out/` current after commit, checkout,
+merge and rebase, install the git hooks once per clone:
+
+```bash
+pre-commit install --allow-missing-config
+```
+
+Get pre-commit with `uv tool install pre-commit` or pipx. The hooks need a
+POSIX `sh` (on Windows: Git Bash) and `uv`. The graph is not committed.
+
 ## License
 
 MIT
